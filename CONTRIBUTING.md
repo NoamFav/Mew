@@ -10,9 +10,10 @@ Welcome! This guide covers everything you need to contribute to this project —
 4. [Create a Branch](#create-a-branch)
 5. [Build & Test Locally](#build--test-locally)
 6. [Write Your Commits](#write-your-commits)
-7. [Open a Pull Request](#open-a-pull-request)
-8. [Review Process](#review-process)
-9. [Code Style](#code-style)
+7. [Rebase Before You Push](#rebase-before-you-push)
+8. [Open a Pull Request](#open-a-pull-request)
+9. [Review Process](#review-process)
+10. [Code Style](#code-style)
 
 ---
 
@@ -166,6 +167,73 @@ build(makefile): add lint target with cppcheck
 - Subject line ≤ 72 characters
 - Use imperative mood: "add", not "added" or "adds"
 - No trailing period on the subject line
+
+---
+
+## Rebase Before You Push
+
+This repo enforces **linear history** — no merge commits allowed. That means instead of merging `main` into your branch to pick up new changes, you **rebase** your branch on top of `main`.
+
+### What's the difference?
+
+```
+# Merge (creates an ugly merge commit — not allowed here)
+main:       A ── B ── C ── M
+                           ↑ merge commit
+your branch:        D ── E
+
+# Rebase (replays your commits on top of main — clean, linear)
+main:       A ── B ── C
+                       └── D' ── E'   ← your commits, replayed on top
+```
+
+### How to rebase
+
+Before opening a PR, always do this:
+
+```sh
+# 1. Pull the latest main from upstream
+git fetch upstream
+git checkout main
+git merge upstream/main
+
+# 2. Switch back to your branch and rebase
+git checkout feat/your-feature-name
+git rebase main
+```
+
+### If there are conflicts
+
+Git will pause and tell you which file has a conflict. Open it, look for the conflict markers, and resolve it:
+
+```
+<<<<<<< HEAD
+int current_main_version = 1;
+=======
+int your_version = 2;
+>>>>>>> feat/your-feature-name
+```
+
+Edit the file to keep what's correct, then:
+
+```sh
+git add <the-file-you-fixed>
+git rebase --continue
+```
+
+Repeat for each conflicting commit until the rebase finishes.
+
+### Force-push after rebasing
+
+Because rebase rewrites your commits, you need to force-push to your fork:
+
+```sh
+git push --force-with-lease origin feat/your-feature-name
+```
+
+> Use `--force-with-lease` not `--force` — it refuses to push if someone else has pushed to the same branch in the meantime, which protects you from accidentally overwriting their work.
+
+> **Never rebase or force-push a branch that someone else is actively reviewing.** Add new commits instead, and rebase only once the review is done.
 
 ---
 

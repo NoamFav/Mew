@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build & Test — ${{ matrix.os }} / ${{ matrix.cc }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cc: gcc
+          - os: ubuntu-latest
+            cc: clang
+          - os: macos-latest
+            cc: clang
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build (debug — ASAN + UBSAN)
+        run: make CC=${{ matrix.cc }}
+
+      - name: Build (release)
+        run: make release CC=${{ matrix.cc }}
+
+      - name: Smoke test — stdin
+        run: echo "hello world" | ./mew
+
+      - name: Smoke test — single file
+        run: ./mew main.c
+
+      - name: Smoke test — multiple files
+        run: ./mew main.c src/minette.c src/display_file.c src/helpers.c
+
+      - name: Smoke test — explicit stdin with -
+        run: echo "via dash" | ./mew -
+
+      - name: Smoke test — error on missing file (exit 1)
+        run: |
+          ./mew /nonexistent 2>&1 | grep -q "mew:" && exit 0 || exit 1
+
+      - name: Clean
+        run: make fclean
