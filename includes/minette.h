@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 
+int write_all(int fd, const char *buf, ssize_t len);
 int display_loop(int argc, char **argv, int i, int error);
 int minette(int argc, char **filename);
 int display_file(int fd, const char *name);
