@@ -2,6 +2,7 @@
 #define MINETTE_H
 
 #define PROGNAME "mew"
+#define BUF_SIZE 4096
 
 #include <errno.h>
 #include <fcntl.h>
