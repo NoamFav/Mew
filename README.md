@@ -37,6 +37,7 @@
 It handles:
 - One or more **file arguments**
 - **Standard input** — when called with no args, or with `-` as a filename
+- **POSIX flags** — parsed with `getopt(3)` into a `t_opts` struct
 - Proper **error reporting** on stderr, prefixed with the program name
 - **Partial writes** — a `write_all` loop ensures every byte reaches the output
 
@@ -103,6 +104,38 @@ No shortcuts. No buffering from the C library. Real I/O.
 <!-- Divider -->
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
 
+<!-- Flags -->
+<div align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=28&pause=1000&color=00D9FF&center=true&width=800&lines=%F0%9F%9A%A9+FLAGS+%F0%9F%9A%A9" alt="Flags" />
+</div>
+
+<br>
+
+`src/parser.c` parses these with `getopt(3)` into a `t_opts` struct that's threaded through `display_loop()` and `display_file()`:
+
+| Flag | Meaning |
+|------|---------|
+| `-A` | Equivalent to `-vET` |
+| `-b` | Number nonempty output lines, overrides `-n` |
+| `-e` | Equivalent to `-vE` |
+| `-E` | Display `$` at the end of each line |
+| `-n` | Number all output lines |
+| `-s` | Suppress repeated empty output lines |
+| `-t` | Equivalent to `-vT` |
+| `-T` | Display TAB characters as `^I` |
+| `-u` | Accepted and ignored (POSIX compatibility) |
+| `-v` | Show non-printing characters using `^` and `M-` notation |
+
+An unrecognized flag prints a `usage:` message to stderr and exits with status 1.
+
+> [!NOTE]
+> `t_opts` is fully parsed today, but `display_file()` doesn't act on it yet
+> (`(void)opts;`) — the flags above are recognized on the command line, but
+> don't yet change the output. Wiring that up is in progress.
+
+<!-- Divider -->
+<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
+
 <!-- Quickstart -->
 <div align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=28&pause=1000&color=00D9FF&center=true&width=800&lines=%E2%9C%A8+QUICKSTART+%E2%9C%A8" alt="Quickstart" />
@@ -124,6 +157,7 @@ make release
 ./mew file1.txt file2.txt
 ./mew -                     # read from stdin
 echo "hello" | ./mew
+./mew -n file1.txt          # with flags, e.g. number output lines
 ```
 
 > [!NOTE]
@@ -157,11 +191,18 @@ make fclean   # clean + remove the mew binary
 Mew/
 ├── main.c              Entry point — calls mew()
 ├── includes/
-│   └── mew.h           All declarations in one header
+│   └── mew.h           PROGNAME + mew() prototype
 ├── src/
 │   ├── mew.c           Argument loop — delegates to display_file()
+│   ├── mew.h           display_loop() / mew() prototypes
 │   ├── display_file.c  Core I/O — read() loop + write_all()
-│   └── helpers.c       getlen(), file_error() for stderr output
+│   ├── display_file.h  display_file() prototype
+│   ├── helpers.c       getlen(), file_error(), write_all(), usage_exit()
+│   ├── helpers.h       Shared helpers + PROGNAME / BUF_SIZE
+│   ├── parser.c        getopt() flag parsing → t_opts
+│   └── parser.h        t_opts struct + opts_parser() prototype
+├── tools/
+│   └── genh.sh         Generates a header from a .c file (cproto)
 ├── build/
 │   ├── debug/          Object files for debug build
 │   └── release/        Object files for release build
