@@ -1,4 +1,4 @@
-# Contributing to minette
+# Contributing to mew
 
 Welcome! This guide covers everything you need to contribute to this project — from setting up your fork to getting your PR merged. If this is your first time collaborating on GitHub, you're in the right place.
 
@@ -22,11 +22,11 @@ Welcome! This guide covers everything you need to contribute to this project —
 GitHub collaboration follows this pattern:
 
 ```
-[upstream: NoamFav/Minette]   ← the "real" repo — everyone's work ends up here
+[upstream: NoamFav/Mew]   ← the "real" repo — everyone's work ends up here
           ↕  sync
-[your fork: you/Minette]      ← your personal copy of the repo on GitHub
+[your fork: you/Mew]      ← your personal copy of the repo on GitHub
           ↕  push / pull
-[your machine: ~/Minette]     ← where you actually write code
+[your machine: ~/Mew]     ← where you actually write code
 ```
 
 You **never push directly to upstream**. You push to *your fork*, then open a **Pull Request** (PR) to propose your changes. A maintainer reviews and merges it.
@@ -37,13 +37,13 @@ You **never push directly to upstream**. You push to *your fork*, then open a **
 
 ### 1. Fork the repo
 
-Go to [https://github.com/NoamFav/Minette](https://github.com/NoamFav/Minette) and click **Fork** in the top-right corner. This creates `your-username/Minette` on GitHub — your own personal copy.
+Go to [https://github.com/NoamFav/Mew](https://github.com/NoamFav/Mew) and click **Fork** in the top-right corner. This creates `your-username/Mew` on GitHub — your own personal copy.
 
 ### 2. Clone your fork to your machine
 
 ```sh
-git clone https://github.com/YOUR_USERNAME/Minette.git
-cd Minette
+git clone https://github.com/YOUR_USERNAME/Mew.git
+cd Mew
 ```
 
 ### 3. Add the upstream remote
@@ -51,17 +51,17 @@ cd Minette
 This connects your local repo to the original project so you can pull in updates:
 
 ```sh
-git remote add upstream https://github.com/NoamFav/Minette.git
+git remote add upstream https://github.com/NoamFav/Mew.git
 ```
 
 Verify both remotes are set:
 
 ```sh
 git remote -v
-# origin    https://github.com/YOUR_USERNAME/Minette.git (fetch)
-# origin    https://github.com/YOUR_USERNAME/Minette.git (push)
-# upstream  https://github.com/NoamFav/Minette.git (fetch)
-# upstream  https://github.com/NoamFav/Minette.git (push)
+# origin    https://github.com/YOUR_USERNAME/Mew.git (fetch)
+# origin    https://github.com/YOUR_USERNAME/Mew.git (push)
+# upstream  https://github.com/NoamFav/Mew.git (fetch)
+# upstream  https://github.com/NoamFav/Mew.git (push)
 ```
 
 ---
@@ -245,7 +245,7 @@ Once your branch is ready:
 git push origin feat/your-feature-name
 ```
 
-Go to [https://github.com/NoamFav/Minette](https://github.com/NoamFav/Minette) — GitHub will show a banner prompting you to open a PR. Click **Compare & pull request**.
+Go to [https://github.com/NoamFav/Mew](https://github.com/NoamFav/Mew) — GitHub will show a banner prompting you to open a PR. Click **Compare & pull request**.
 
 Fill in:
 
@@ -308,4 +308,4 @@ This project targets **C11** with strict compiler flags. Your code must compile 
 
 ## Questions?
 
-Open an issue on [GitHub](https://github.com/NoamFav/Minette/issues) or ping us on Discord.
+Open an issue on [GitHub](https://github.com/NoamFav/Mew/issues) or ping us on Discord.

@@ -39,7 +39,7 @@ jobs:
         run: ./mew main.c
 
       - name: Smoke test — multiple files
-        run: ./mew main.c src/minette.c src/display_file.c src/helpers.c
+        run: ./mew main.c src/mew.c src/display_file.c src/helpers.c
 
       - name: Smoke test — explicit stdin with -
         run: echo "via dash" | ./mew -

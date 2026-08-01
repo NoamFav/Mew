@@ -19,7 +19,7 @@
 ```sh
 # example:
 echo "hello" | ./mew
-./mew main.c src/minette.c
+./mew main.c src/mew.c
 ./mew /nonexistent   # should print error to stderr, exit 1
 ```
 

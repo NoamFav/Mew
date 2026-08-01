@@ -1,5 +1,5 @@
-#include "includes/minette.h"
+#include "src/mew.h"
 
 int main(int argc, char **argv) {
-    return (minette(argc, argv));
+    return (mew(argc, argv));
 }

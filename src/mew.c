@@ -1,4 +1,8 @@
-#include "../includes/minette.h"
+#include "mew.h"
+#include "display_file.h"
+#include "helpers.h"
+#include <fcntl.h>
+#include <unistd.h>
 
 int display_loop(int argc, char **argv, int i, int error) {
     int fd;
@@ -28,6 +32,6 @@ int display_loop(int argc, char **argv, int i, int error) {
     return (error);
 }
 
-int minette(int argc, char **argv) {
+int mew(int argc, char **argv) {
     return (display_loop(argc, argv, 0, 0));
 }

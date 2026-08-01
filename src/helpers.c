@@ -1,4 +1,4 @@
-#include "../includes/minette.h"
+#include "helpers.h"
 
 int getlen(const char *str) {
     int(i) = 0;
