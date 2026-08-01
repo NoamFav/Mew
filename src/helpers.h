@@ -10,4 +10,5 @@
 int getlen(const char *str);
 int file_error(const char *name);
 int write_all(int fd, const char *buf, ssize_t len);
+void usage_exit(const char *prog, int c);
 #endif

@@ -3,7 +3,7 @@
 
 #include "parser.h"
 
-int display_loop(int argc, char **argv, t_opts opts, int i, int error);
+int display_loop(int argc, char **argv, t_opts opts);
 int mew(int argc, char **argv);
 
 #endif
