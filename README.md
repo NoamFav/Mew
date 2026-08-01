@@ -133,6 +133,15 @@ An unrecognized flag prints a `usage:` message to stderr and exits with status 1
 > (`(void)opts;`) — the flags above are recognized on the command line, but
 > don't yet change the output. Wiring that up is in progress.
 
+> [!NOTE]
+> `parser.c` targets `#define _POSIX_C_SOURCE 200809L` (POSIX.1-2008)
+> explicitly, rather than relying on whatever a given libc exposes by
+> default — this is what makes `getopt`/`optarg`/`optind` visible under
+> strict `-std=c11`. Its optstring is also prefixed with `+`, forcing
+> POSIX's non-permuting "options before operands" behavior instead of
+> glibc's GNU-style flag reordering. Concretely: `mew -n file.txt` works,
+> `mew file.txt -n` doesn't — on every platform mew targets, not just some.
+
 <!-- Divider -->
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
 
@@ -164,6 +173,15 @@ echo "hello" | ./mew
 > The debug build links **AddressSanitizer** and **UndefinedBehaviorSanitizer**.
 > Any memory error or undefined behaviour will abort with a detailed message —
 > this is intentional and very useful while developing.
+
+> [!IMPORTANT]
+> `mew` calls POSIX syscalls directly (`open`/`read`/`write`/`close`,
+> `getopt`) instead of going through portable C `stdio` — it needs a real
+> POSIX environment to build and run:
+> - **Linux, macOS, the BSDs** — native, no extra setup
+> - **Windows** — only via **WSL2** (a real Linux kernel); raw `cmd.exe`
+>   and PowerShell don't implement the POSIX interface `mew` depends on,
+>   so it won't build there
 
 <!-- Divider -->
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
