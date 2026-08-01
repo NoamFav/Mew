@@ -8,7 +8,7 @@ t_opts opts_parser(int argc, char **argv) {
     int opt;
 
     opterr = 0;
-    while ((opt = getopt(argc, argv, "nbeEtTAvsu")) != -1) {
+    while ((opt = getopt(argc, argv, "+nbeEtTAvsu")) != -1) {
         if (opt == 'n')
             opts.number_lines = 1;
         else if (opt == 'b')
