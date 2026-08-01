@@ -11,7 +11,7 @@
 <!-- Badges -->
 [![C11](https://img.shields.io/badge/C11-00599C?style=for-the-badge&logo=c&logoColor=white&labelColor=0D1117)](https://en.cppreference.com/w/c/11)
 [![POSIX](https://img.shields.io/badge/POSIX-zero%20deps-brightgreen?style=for-the-badge&labelColor=0D1117)]()
-[![CI](https://img.shields.io/github/actions/workflow/status/NoamFav/Minette/ci.yml?style=for-the-badge&label=CI&logo=github-actions&logoColor=white&labelColor=0D1117)](https://github.com/NoamFav/Minette/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/NoamFav/Mew/ci.yml?style=for-the-badge&label=CI&logo=github-actions&logoColor=white&labelColor=0D1117)](https://github.com/NoamFav/Mew/actions)
 [![License](https://img.shields.io/badge/Apache%202.0-D22128?style=for-the-badge&logo=opensourceinitiative&logoColor=white&labelColor=0D1117)](./LICENSE.md)
 [![42](https://img.shields.io/badge/42-school-000000?style=for-the-badge&labelColor=0D1117)]()
 
@@ -32,7 +32,7 @@
 <td width="50%" valign="top">
 
 ### The Project
-**mew** (`minette`) is a `cat` reimplementation in C11. No `printf`, no `stdlib` — just four syscalls: `open`, `read`, `write`, `close`.
+**mew** is a `cat` reimplementation in C11. No `printf`, no `stdlib` — just four syscalls: `open`, `read`, `write`, `close`.
 
 It handles:
 - One or more **file arguments**
@@ -112,7 +112,7 @@ No shortcuts. No buffering from the C library. Real I/O.
 
 ```sh
 # Clone
-git clone https://github.com/NoamFav/Minette.git && cd Minette
+git clone https://github.com/NoamFav/Mew.git && cd Mew
 
 # Build (debug — ASAN + UBSAN enabled)
 make
@@ -154,12 +154,12 @@ make fclean   # clean + remove the mew binary
 <br>
 
 ```
-Minette/
-├── main.c              Entry point — calls minette()
+Mew/
+├── main.c              Entry point — calls mew()
 ├── includes/
-│   └── minette.h       All declarations in one header
+│   └── mew.h           All declarations in one header
 ├── src/
-│   ├── minette.c       Argument loop — delegates to display_file()
+│   ├── mew.c           Argument loop — delegates to display_file()
 │   ├── display_file.c  Core I/O — read() loop + write_all()
 │   └── helpers.c       getlen(), file_error() for stderr output
 ├── build/

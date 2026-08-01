@@ -1,4 +1,6 @@
-#include "../includes/minette.h"
+#include "display_file.h"
+#include "helpers.h"
+#include <unistd.h>
 
 int display_file(int fd, const char *name) {
     int line;
