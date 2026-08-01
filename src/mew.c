@@ -1,14 +1,15 @@
 #include "mew.h"
 #include "display_file.h"
 #include "helpers.h"
+#include "parser.h"
 #include <fcntl.h>
 #include <unistd.h>
 
-int display_loop(int argc, char **argv, int i, int error) {
+int display_loop(int argc, char **argv, t_opts opts, int i, int error) {
     int fd;
 
     if (argc == 1) {
-        return (display_file(0, "-"));
+        return (display_file(0, opts, "-"));
     }
     while (++i < argc) {
 
@@ -19,7 +20,7 @@ int display_loop(int argc, char **argv, int i, int error) {
         }
 
         if (fd != -1) {
-            if (display_file(fd, argv[i]) == 1) {
+            if (display_file(fd, opts, argv[i]) == 1) {
                 error = 1;
             }
             if (fd > 0) {
@@ -33,5 +34,9 @@ int display_loop(int argc, char **argv, int i, int error) {
 }
 
 int mew(int argc, char **argv) {
-    return (display_loop(argc, argv, 0, 0));
+    t_opts opts;
+
+    opts = opts_parser(argc, argv);
+
+    return (display_loop(argc, argv, opts, 0, 0));
 }
