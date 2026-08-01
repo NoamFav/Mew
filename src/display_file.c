@@ -2,10 +2,11 @@
 #include "helpers.h"
 #include <unistd.h>
 
-int display_file(int fd, const char *name) {
+int display_file(int fd, t_opts opts, const char *name) {
     int line;
     char buf[BUF_SIZE];
     int chunk = sizeof(buf);
+    (void)opts;
 
     while (1) {
         line = read(fd, buf, chunk);

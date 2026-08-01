@@ -3,4 +3,6 @@
 
 #define PROGNAME "mew"
 
+int mew(int argc, char **argv);
+
 #endif
