@@ -32,7 +32,7 @@
 <td width="50%" valign="top">
 
 ### The Project
-**mew** is a `cat` reimplementation in C11. No `printf`, no `stdlib` — just four syscalls: `open`, `read`, `write`, `close`.
+**mew** is a `cat` reimplementation in C11. No `printf`, no `stdlib` aside from `exit` — just four syscalls: `open`, `read`, `write`, `close`.
 
 It handles:
 - One or more **file arguments**
