@@ -1,4 +1,5 @@
 #include "helpers.h"
+#include <stdlib.h>
 
 int getlen(const char *str) {
     int(i) = 0;
@@ -6,6 +7,10 @@ int getlen(const char *str) {
         i++;
     }
     return (i);
+}
+
+static void put_err(const char *s) {
+    write_all(STDERR_FILENO, s, getlen(s));
 }
 
 int write_all(int fd, const char *buf, ssize_t len) {
@@ -23,10 +28,24 @@ int write_all(int fd, const char *buf, ssize_t len) {
 }
 
 int file_error(const char *name) {
-    write_all(2, PROGNAME ": ", getlen(PROGNAME ": "));
-    write_all(2, name, getlen(name));
-    write_all(2, ": ", 2);
-    write_all(2, strerror(errno), getlen(strerror(errno)));
-    write_all(2, "\n", 1);
+    put_err(PROGNAME ": ");
+    put_err(name);
+    put_err(": ");
+    put_err(strerror(errno));
+    put_err("\n");
     return (1);
+}
+
+void usage_exit(const char *prog, int c) {
+    char ch;
+
+    ch = (char)c;
+    put_err(prog);
+    put_err(": invalid option -- '");
+    write_all(STDERR_FILENO, &ch, 1);
+    put_err("'\n");
+    put_err("usage: ");
+    put_err(prog);
+    put_err(" [-benstuvAET] [file ...]\n");
+    exit(1);
 }
