@@ -4,7 +4,7 @@
 
 int display_file(int fd, const char *name) {
     int line;
-    char buf[1024];
+    char buf[BUF_SIZE];
     int chunk = sizeof(buf);
 
     while (1) {
