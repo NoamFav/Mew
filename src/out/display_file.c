@@ -21,7 +21,7 @@ int display_file(int fd, t_opts opts, const char *name) {
     };
 
     ssize_t n = 0;
-    size_t j, i, len, digits = 0;
+    size_t i, j, len, digits = 0;
 
     while (1) {
         n = read(fd, buf, READ_SIZE);
@@ -42,21 +42,24 @@ int display_file(int fd, t_opts opts, const char *name) {
                 }
                 linestate.at_bol = 0;
             }
-
-            for (j = i; j < (size_t)n && buf[j] != '\n'; j++)
-                ;
-
-            if (j < (size_t)n) {
-                ob_append(buf + i, j - i, &outbuf);
-                if (opts.show_ends) {
+            for (j = i; j < (size_t)n; j++) {
+                if (buf[j] == '\n')
+                    break;
+                if (opts.show_tabs && buf[j] == '\t')
+                    break;
+            }
+            ob_append(buf + i, j - i, &outbuf);
+            if (j == (size_t)n) {
+                i = (size_t)n;
+            } else if (buf[j] == '\t') {
+                ob_append("^I", 2, &outbuf);
+                i = j + 1;
+            } else {
+                if (opts.show_ends)
                     ob_append("$", 1, &outbuf);
-                }
                 ob_append("\n", 1, &outbuf);
                 linestate.at_bol = 1;
                 i = j + 1;
-            } else {
-                ob_append(buf + i, n - i, &outbuf);
-                i = (size_t)n;
             }
         }
         if (interactive) {
