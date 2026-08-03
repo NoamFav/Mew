@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "parser.h"
-#include "helpers.h"
+#include "util/error.h"
 #include <unistd.h>
 
 t_opts opts_parser(int argc, char **argv) {
