@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #define NUM_WIDTH 6
+#define READ_SIZE 4096
 
 typedef struct s_linestate {
     size_t line_num;

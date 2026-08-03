@@ -10,7 +10,7 @@ typedef struct s_outbuf {
     size_t len;
 } t_outbuf;
 
-void flush_out(t_outbuf *outbuf);
-void append(const char *s, size_t len, t_outbuf *outbuf);
+void ob_flush(t_outbuf *outbuf);
+void ob_append(const char *s, size_t len, t_outbuf *outbuf);
 
 #endif
