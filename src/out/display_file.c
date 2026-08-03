@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "out/display_file.h"
 #include "out/outbuf.h"
 #include "util/error.h"
@@ -6,6 +8,7 @@
 
 int display_file(int fd, t_opts opts, const char *name) {
     char buf[READ_SIZE], num[24];
+    int interactive = isatty(fd);
 
     t_linestate linestate = {1, 1};
     t_outbuf outbuf = {0};
@@ -41,6 +44,9 @@ int display_file(int fd, t_opts opts, const char *name) {
                 ob_append(buf + i, n - i, &outbuf);
                 i = (size_t)n;
             }
+        }
+        if (interactive) {
+            ob_flush(&outbuf);
         }
     }
     return (0);
