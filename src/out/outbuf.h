@@ -1,7 +1,7 @@
 #ifndef OUTBUF_H
 #define OUTBUF_H
 
-#include "../helpers.h"
+#include "../../includes/mew.h"
 #include <stddef.h>
 
 typedef struct s_outbuf {

@@ -1,5 +1,6 @@
 #include "display_file.h"
-#include "../helpers.h"
+#include "../util/error.h"
+#include "../util/num.h"
 #include "outbuf.h"
 #include <unistd.h>
 
