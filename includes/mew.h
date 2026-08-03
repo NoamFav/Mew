@@ -2,8 +2,6 @@
 #define MEW_H
 
 #define PROGNAME "mew"
-#define BUF_SIZE 4096
-#define NUM_WIDTH 6
 
 #include "parser.h"
 
