@@ -1,7 +1,7 @@
-#include "error.h"
-#include "../../includes/mew.h"
-#include "io.h"
-#include "str.h"
+#include "util/error.h"
+#include "../includes/mew.h"
+#include "util/io.h"
+#include "util/str.h"
 
 static void put_err(const char *s) {
     write_all(STDERR_FILENO, s, getlen(s));

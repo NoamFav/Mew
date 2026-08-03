@@ -1,7 +1,7 @@
-#include "str.h"
+#include "util/str.h"
 
-int getlen(const char *str) {
-    int(i) = 0;
+size_t getlen(const char *str) {
+    size_t(i) = 0;
     while (str[i]) {
         i++;
     }

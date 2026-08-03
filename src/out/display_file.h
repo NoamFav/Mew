@@ -1,7 +1,7 @@
 #ifndef DISPLAY_FILE_H
 #define DISPLAY_FILE_H
 
-#include "../parser.h"
+#include "parser.h"
 #include <unistd.h>
 
 typedef struct s_linestate {

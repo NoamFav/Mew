@@ -2,7 +2,8 @@ CC      ?= cc
 NAME    := mew
 
 CFLAGS  := -std=c11 -Wall -Wextra -Werror -Wshadow -Wswitch-enum \
-           -Wformat=2 -Wwrite-strings -Wvla -Wmissing-prototypes
+           -Wformat=2 -Wwrite-strings -Wvla -Wmissing-prototypes \
+		   -Iincludes -Isrc
 DEBUG   := -g3 -gdwarf-4 -O0 -fno-omit-frame-pointer \
            -fsanitize=address,undefined -fno-sanitize-recover=all
 RELEASE := -O2 -DNDEBUG
@@ -16,7 +17,7 @@ else
   LDFLAGS += -fsanitize=address,undefined
 endif
 
-SOURCES := $(shell find . -name '*.c' -not -path './build/*')
+SOURCES := $(shell find . -name '*.c' -not -path './build/*' | sed 's|^\./||')
 OBJDIR  := build/$(BUILD)
 OBJECTS := $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPS    := $(OBJECTS:.o=.d)
