@@ -1,7 +1,7 @@
 #include "mew.h"
-#include "display_file.h"
 #include "helpers.h"
 #include "parser.h"
+#include "ui/display_file.h"
 #include <fcntl.h>
 #include <unistd.h>
 
