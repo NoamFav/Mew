@@ -47,7 +47,11 @@ int display_file(int fd, t_opts opts, const char *name) {
                 ;
 
             if (j < (size_t)n) {
-                ob_append(buf + i, j - i + 1, &outbuf);
+                ob_append(buf + i, j - i, &outbuf);
+                if (opts.show_ends) {
+                    ob_append("$", 1, &outbuf);
+                }
+                ob_append("\n", 1, &outbuf);
                 linestate.at_bol = 1;
                 i = j + 1;
             } else {
