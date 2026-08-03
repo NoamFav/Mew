@@ -10,8 +10,15 @@ int display_file(int fd, t_opts opts, const char *name) {
     char buf[READ_SIZE], num[24];
     int interactive = isatty(fd);
 
-    t_linestate linestate = {1, 1};
-    t_outbuf outbuf = {0};
+    t_linestate linestate = {
+        1,
+        1,
+    };
+
+    t_outbuf outbuf = {
+        {0},
+        0,
+    };
 
     ssize_t n = 0;
     size_t j, i, len, digits = 0;
@@ -23,13 +30,16 @@ int display_file(int fd, t_opts opts, const char *name) {
             return (n == -1 ? file_error(name) : 0);
         }
         for (i = 0; i < (size_t)n;) {
-            if (linestate.at_bol && opts.number_lines) {
-                digits = count_digits(linestate.line_num);
-                if (digits < NUM_WIDTH)
-                    ob_append("      ", NUM_WIDTH - digits, &outbuf);
-                len = num_to_buf(linestate.line_num++, num);
-                num[len++] = '\t';
-                ob_append(num, len, &outbuf);
+            if (linestate.at_bol && (opts.number_lines || opts.number_nonblank)) {
+                int blank = (buf[i] == '\n');
+                if (!(opts.number_nonblank && blank)) {
+                    digits = count_digits(linestate.line_num);
+                    if (digits < NUM_WIDTH)
+                        ob_append("      ", NUM_WIDTH - digits, &outbuf);
+                    len = num_to_buf(linestate.line_num++, num);
+                    num[len++] = '\t';
+                    ob_append(num, len, &outbuf);
+                }
                 linestate.at_bol = 0;
             }
 
