@@ -1,25 +1,7 @@
 #include "display_file.h"
-#include "helpers.h"
+#include "../helpers.h"
+#include "outbuf.h"
 #include <unistd.h>
-
-static void flush_out(t_outbuf *outbuf) {
-    if (outbuf->len > 0) {
-        write_all(STDOUT_FILENO, outbuf->data, outbuf->len);
-        outbuf->len = 0;
-    }
-}
-
-static void append(const char *s, size_t len, t_outbuf *outbuf) {
-    if (len >= BUF_SIZE) {
-        flush_out(outbuf);
-        write_all(STDOUT_FILENO, s, len);
-        return;
-    }
-    if (outbuf->len + len > BUF_SIZE)
-        flush_out(outbuf);
-    nf_memcpy(outbuf->data + outbuf->len, s, len);
-    outbuf->len += len;
-}
 
 int display_file(int fd, t_opts opts, const char *name) {
     char buf[BUF_SIZE], num[24];

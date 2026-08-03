@@ -1,13 +1,8 @@
 #ifndef DISPLAY_FILE_H
 #define DISPLAY_FILE_H
 
-#include "helpers.h"
-#include "parser.h"
-
-typedef struct s_outbuf {
-    char data[BUF_SIZE];
-    size_t len;
-} t_outbuf;
+#include "../helpers.h"
+#include "../parser.h"
 
 typedef struct s_linestate {
     size_t line_num;
