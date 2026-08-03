@@ -2,21 +2,63 @@
 #include "helpers.h"
 #include <unistd.h>
 
+static void flush_out(t_outbuf *outbuf) {
+    if (outbuf->len > 0) {
+        write_all(STDOUT_FILENO, outbuf->data, outbuf->len);
+        outbuf->len = 0;
+    }
+}
+
+static void append(const char *s, size_t len, t_outbuf *outbuf) {
+    if (len >= BUF_SIZE) {
+        flush_out(outbuf);
+        write_all(STDOUT_FILENO, s, len);
+        return;
+    }
+    if (outbuf->len + len > BUF_SIZE)
+        flush_out(outbuf);
+    nf_memcpy(outbuf->data + outbuf->len, s, len);
+    outbuf->len += len;
+}
+
 int display_file(int fd, t_opts opts, const char *name) {
-    int line;
-    char buf[BUF_SIZE];
-    int chunk = sizeof(buf);
-    (void)opts;
+    char buf[BUF_SIZE], num[24];
+
+    t_linestate linestate = {1, 1};
+    t_outbuf outbuf = {0};
+
+    ssize_t n = 0;
+    size_t j, i, len, digits = 0;
 
     while (1) {
-        line = read(fd, buf, chunk);
-        if (line == -1) {
-            return (file_error(name));
+        n = read(fd, buf, BUF_SIZE);
+        if (n <= 0) {
+            flush_out(&outbuf);
+            return (n == -1 ? file_error(name) : 0);
         }
-        if (line == 0) {
-            return (0);
+        for (i = 0; i < (size_t)n;) {
+            if (linestate.at_bol && opts.number_lines) {
+                digits = count_digits(linestate.line_num);
+                if (digits < NUM_WIDTH)
+                    append("      ", NUM_WIDTH - digits, &outbuf);
+                len = num_to_buf(linestate.line_num++, num);
+                num[len++] = '\t';
+                append(num, len, &outbuf);
+                linestate.at_bol = 0;
+            }
+
+            for (j = i; j < (size_t)n && buf[j] != '\n'; j++)
+                ;
+
+            if (j < (size_t)n) {
+                append(buf + i, j - i + 1, &outbuf);
+                linestate.at_bol = 1;
+                i = j + 1;
+            } else {
+                append(buf + i, n - i, &outbuf);
+                i = (size_t)n;
+            }
         }
-        write_all(1, buf, line);
     }
     return (0);
 }
