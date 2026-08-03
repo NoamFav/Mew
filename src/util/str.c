@@ -1,7 +1,8 @@
 #include "util/str.h"
 
 size_t getlen(const char *str) {
-    size_t(i) = 0;
+    size_t i = 0;
+
     while (str[i]) {
         i++;
     }

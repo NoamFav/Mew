@@ -1,4 +1,4 @@
-#include "../includes/mew.h"
+#include "mew.h"
 #include "out/display_file.h"
 #include "parser.h"
 #include "util/error.h"

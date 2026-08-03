@@ -4,6 +4,8 @@
 #include "parser.h"
 #include <unistd.h>
 
+#define NUM_WIDTH 6
+
 typedef struct s_linestate {
     size_t line_num;
     int at_bol;

@@ -1,8 +1,9 @@
 #ifndef OUTBUF_H
 #define OUTBUF_H
 
-#include "../includes/mew.h"
 #include <stddef.h>
+
+#define BUF_SIZE 4096
 
 typedef struct s_outbuf {
     char data[BUF_SIZE];
