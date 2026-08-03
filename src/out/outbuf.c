@@ -1,6 +1,6 @@
-#include "outbuf.h"
-#include "../util/io.h"
-#include "../util/str.h"
+#include "out/outbuf.h"
+#include "util/io.h"
+#include "util/str.h"
 
 void flush_out(t_outbuf *outbuf) {
     if (outbuf->len > 0) {

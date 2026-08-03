@@ -1,7 +1,7 @@
-#include "display_file.h"
-#include "../util/error.h"
-#include "../util/num.h"
-#include "outbuf.h"
+#include "out/display_file.h"
+#include "out/outbuf.h"
+#include "util/error.h"
+#include "util/num.h"
 #include <unistd.h>
 
 int display_file(int fd, t_opts opts, const char *name) {
