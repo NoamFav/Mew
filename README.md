@@ -94,8 +94,10 @@ No shortcuts. No buffering from the C library. Real I/O.
 #### Correctness
 - **Partial writes handled** — `write_all` loops until every byte is flushed
 - **Errors to stderr** — `mew: <filename>: <reason>` format, exit code 1
+- **Write failures caught too** — a closed fd or full disk fails the same way a read error does, instead of silently exiting 0
 - **No stdio buffering** — `read()`/`write()` go straight to the kernel; no `fopen`, no `printf`
-- **Strict compilation** — `-Wall -Wextra -Werror` plus shadow, VLA, format checks
+- **Strict compilation** — `-Wall -Wextra -Werror` plus shadow, VLA, format checks, clean on GCC and Clang
+- **Tested** — `make test` runs a byte-for-byte suite against `cat`, in CI across Ubuntu/macOS and gcc/clang
 
 </td>
 </tr>
@@ -128,10 +130,16 @@ No shortcuts. No buffering from the C library. Real I/O.
 
 An unrecognized flag prints a `usage:` message to stderr and exits with status 1.
 
-> [!NOTE]
-> `t_opts` is fully parsed today, but `display_file()` doesn't act on it yet
-> (`(void)opts;`) — the flags above are recognized on the command line, but
-> don't yet change the output. Wiring that up is in progress.
+`-v` (and the non-printing part of `-e`/`-t`/`-A`) covers the full byte
+range, not just ASCII control characters:
+
+| Byte range | Rendered as |
+|------------|-------------|
+| `0x00`–`0x1F` (excluding `\t`/`\n`) | `^@`–`^_` |
+| `0x7F` (DEL) | `^?` |
+| `0x80`–`0x9F` | `M-^@`–`M-^_` |
+| `0xA0`–`0xFE` | `M-` + the literal stripped byte |
+| `0xFF` | `M-^?` |
 
 > [!NOTE]
 > `parser.c` targets `#define _POSIX_C_SOURCE 200809L` (POSIX.1-2008)
@@ -197,6 +205,7 @@ echo "hello" | ./mew
 make          # debug build — ASAN + UBSAN, -g3
 make release  # release build — -O2 -DNDEBUG, no sanitizers
 make re       # fclean + all (full rebuild)
+make test     # build + run tests/run_tests.sh, non-zero exit on failure
 make clean    # remove build/ directory
 make fclean   # clean + remove the mew binary
 ```
@@ -207,23 +216,34 @@ make fclean   # clean + remove the mew binary
 
 ```
 Mew/
-├── main.c              Entry point — calls mew()
+├── main.c                  Entry point — calls mew()
 ├── includes/
-│   └── mew.h           PROGNAME + mew() prototype
+│   └── mew.h               PROGNAME + mew()/display_loop() prototypes
 ├── src/
-│   ├── mew.c           Argument loop — delegates to display_file()
-│   ├── mew.h           display_loop() / mew() prototypes
-│   ├── display_file.c  Core I/O — read() loop + write_all()
-│   ├── display_file.h  display_file() prototype
-│   ├── helpers.c       getlen(), file_error(), write_all(), usage_exit()
-│   ├── helpers.h       Shared helpers + PROGNAME / BUF_SIZE
-│   ├── parser.c        getopt() flag parsing → t_opts
-│   └── parser.h        t_opts struct + opts_parser() prototype
+│   ├── mew.c               Argument loop — delegates to display_file()
+│   ├── parser.c            getopt() flag parsing → t_opts
+│   ├── parser.h            t_opts struct + opts_parser() prototype
+│   ├── out/
+│   │   ├── display_file.c  Core I/O — read() loop, drives rendering + flush
+│   │   ├── display_file.h  display_file() prototype + t_linestate
+│   │   ├── render.c        Special-character rendering (-T/-E/-v/-n)
+│   │   ├── render.h        is_special() / emit_special() / emit_prefix()
+│   │   ├── outbuf.c        Buffered writer — ob_append() / ob_flush()
+│   │   └── outbuf.h
+│   └── util/
+│       ├── error.c         file_error(), usage_exit()
+│       ├── io.c            write_all()
+│       ├── num.c           count_digits(), num_to_buf()
+│       └── str.c           getlen(), nf_memcpy()
+├── tests/
+│   ├── run_tests.sh        POSIX shell test suite
+│   ├── inputs/             Fixture files (text + binary)
+│   └── expected/           Expected output per fixture
 ├── tools/
-│   └── genh.sh         Generates a header from a .c file (cproto)
+│   └── genh.sh             Generates a header from a .c file (cproto)
 ├── build/
-│   ├── debug/          Object files for debug build
-│   └── release/        Object files for release build
+│   ├── debug/              Object files for debug build
+│   └── release/            Object files for release build
 └── Makefile
 ```
 

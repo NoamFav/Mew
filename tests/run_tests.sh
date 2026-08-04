@@ -56,7 +56,7 @@ expect_contains() {
 }
 
 if [ ! -x "$MEW" ]; then
-    printf "error: %s not found -- run $(make) first\n" "$MEW" >&2
+    printf 'error: %s not found -- run `make` first\n' "$MEW" >&2
     exit 1
 fi
 
