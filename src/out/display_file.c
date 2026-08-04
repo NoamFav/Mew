@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 int display_file(int fd, t_opts opts, const char *name) {
-    char buf[READ_SIZE];
+    unsigned char buf[READ_SIZE];
     int interactive = isatty(fd);
     ssize_t n = 0;
     size_t i, j;
@@ -40,7 +40,7 @@ int display_file(int fd, t_opts opts, const char *name) {
             for (j = i; j < (size_t)n && !is_special(buf[j], opts); j++)
                 ;
 
-            if (ob_append(buf + i, j - i, &outbuf) == -1) {
+            if (ob_append((char *)buf + i, j - i, &outbuf) == -1) {
                 return (file_error(name));
             }
             if (j == (size_t)n) {
