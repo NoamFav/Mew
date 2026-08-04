@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int display_loop(int argc, char **argv, t_opts opts) {
+static int display_loop(int argc, char **argv, t_opts opts) {
     int fd;
     int i;
     int error;

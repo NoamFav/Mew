@@ -1,5 +1,4 @@
 #include "util/error.h"
-#include "mew.h"
 #include "util/io.h"
 #include "util/str.h"
 

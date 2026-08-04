@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define PROGNAME "mew"
+
 int file_error(const char *name);
 void usage_exit(const char *prog, int c);
 
