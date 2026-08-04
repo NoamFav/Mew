@@ -1,8 +1,8 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "out/display_file.h"
-#include "out/flag.h"
 #include "out/outbuf.h"
+#include "out/render.h"
 #include "util/error.h"
 #include <unistd.h>
 
@@ -40,8 +40,10 @@ int display_file(int fd, t_opts opts, const char *name) {
                 }
                 linestate.at_bol = 0;
             }
+
             for (j = i; j < (size_t)n && !is_special(buf[j], opts); j++)
                 ;
+
             if (ob_append(buf + i, j - i, &outbuf) == -1) {
                 return (file_error(name));
             }
@@ -58,8 +60,7 @@ int display_file(int fd, t_opts opts, const char *name) {
             i = j + 1;
         }
         if (interactive && ob_flush(&outbuf) == -1) {
-            error = 1;
+            return (file_error(name));
         }
     }
-    return (error);
 }
