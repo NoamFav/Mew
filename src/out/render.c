@@ -1,4 +1,4 @@
-#include "out/flag.h"
+#include "out/render.h"
 #include "out/display_file.h"
 #include "out/outbuf.h"
 #include "util/num.h"

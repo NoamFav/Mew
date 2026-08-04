@@ -27,9 +27,9 @@ t_opts opts_parser(int argc, char **argv) {
             opts.show_tabs = (opts.show_nonprint = 1);
         else if (opt == 'A')
             opts.show_ends = (opts.show_tabs = (opts.show_nonprint = 1));
-        else if (opt == 'u')
-            (void)opt;
-        else
+        else if (opt == 'u') {
+            /* no-op, kept for cat compatibility */
+        } else
             usage_exit(argv[0], optopt);
     }
     if (opts.number_nonblank)

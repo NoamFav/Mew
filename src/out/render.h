@@ -1,5 +1,5 @@
-#ifndef FLAG_H
-#define FLAG_H
+#ifndef RENDER_H
+#define RENDER_H
 #include "out/display_file.h"
 #include "out/outbuf.h"
 #include "parser.h"
