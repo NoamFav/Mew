@@ -40,5 +40,7 @@ fclean: clean
 re: fclean all
 debug: $(NAME)
 release: $(NAME)
+test: $(NAME)
+	@bash tests/run_tests.sh
 
-.PHONY: all clean fclean re debug release
+.PHONY: all clean fclean re debug release test
