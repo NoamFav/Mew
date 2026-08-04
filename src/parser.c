@@ -9,28 +9,39 @@ t_opts opts_parser(int argc, char **argv) {
 
     opterr = 0;
     while ((opt = getopt(argc, argv, "+nbeEtTAvsu")) != -1) {
-        if (opt == 'n')
+        switch (opt) {
+        case 'n':
             opts.number_lines = 1;
-        else if (opt == 'b')
+            break;
+        case 'b':
             opts.number_nonblank = 1;
-        else if (opt == 'E')
+            break;
+        case 'E':
             opts.show_ends = 1;
-        else if (opt == 'T')
+            break;
+        case 'T':
             opts.show_tabs = 1;
-        else if (opt == 'v')
+            break;
+        case 'v':
             opts.show_nonprint = 1;
-        else if (opt == 's')
+            break;
+        case 's':
             opts.squeeze_blank = 1;
-        else if (opt == 'e')
-            opts.show_ends = (opts.show_nonprint = 1);
-        else if (opt == 't')
-            opts.show_tabs = (opts.show_nonprint = 1);
-        else if (opt == 'A')
-            opts.show_ends = (opts.show_tabs = (opts.show_nonprint = 1));
-        else if (opt == 'u') {
-            /* no-op, kept for cat compatibility */
-        } else
+            break;
+        case 'e':
+            opts.show_ends = opts.show_nonprint = 1;
+            break;
+        case 't':
+            opts.show_tabs = opts.show_nonprint = 1;
+            break;
+        case 'A':
+            opts.show_ends = opts.show_tabs = opts.show_nonprint = 1;
+            break;
+        case 'u':
+            break;
+        default:
             usage_exit(argv[0], optopt);
+        }
     }
     if (opts.number_nonblank)
         opts.number_lines = 0;
