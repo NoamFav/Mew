@@ -9,7 +9,6 @@
 int display_file(int fd, t_opts opts, const char *name) {
     char buf[READ_SIZE];
     int interactive = isatty(fd);
-    int error = 0;
     ssize_t n = 0;
     size_t i, j;
 
@@ -19,13 +18,10 @@ int display_file(int fd, t_opts opts, const char *name) {
     while (1) {
         n = read(fd, buf, READ_SIZE);
         if (n <= 0) {
-            if (ob_flush(&outbuf) == -1) {
-                error = 1;
-            }
-            if (n == -1) {
+            if (ob_flush(&outbuf) == -1 || n == -1) {
                 return (file_error(name));
             }
-            return (error ? file_error(name) : 0);
+            return (0);
         }
         for (i = 0; i < (size_t)n;) {
             if (buf[i] != '\n') {

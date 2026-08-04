@@ -4,13 +4,7 @@
 #include "util/num.h"
 
 int is_special(char c, t_opts opts) {
-    if (c == '\n') {
-        return (1);
-    }
-    if (opts.show_tabs && c == '\t') {
-        return (1);
-    }
-    return (0);
+    return (c == '\n' || (opts.show_tabs && c == '\t'));
 }
 
 int emit_special(char c, t_opts opts, t_outbuf *ob) {
