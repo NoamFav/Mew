@@ -1,6 +1,9 @@
 #include "util/error.h"
 #include "util/io.h"
 #include "util/str.h"
+#include <errno.h>
+#include <string.h>
+#include <unistd.h>
 
 static void put_fd(int fd, const char *s) {
     write_all(fd, s, getlen(s));
