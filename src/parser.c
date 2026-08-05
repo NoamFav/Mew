@@ -2,6 +2,7 @@
 #include "parser.h"
 #include "util/usage.h"
 #include <getopt.h>
+#include <stddef.h>
 
 static const struct option longopts[] = {
     {"number", no_argument, NULL, 'n'},
