@@ -1,6 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
 #include "parser.h"
-#include "util/error.h"
 #include "util/usage.h"
 
 static const struct option longopts[] = {
@@ -18,12 +17,12 @@ static const struct option longopts[] = {
     {0, 0, 0, 0},
 };
 
-t_opts opts_parser(int argc, char **argv) {
+t_opts opts_parser(int option_count, char **options) {
     t_opts opts = {0};
     int opt;
     opterr = 0;
 
-    while ((opt = getopt_long(argc, argv, "+nbeEtTAvshVu", longopts, NULL)) != -1) {
+    while ((opt = getopt_long(option_count, options, "+nbeEtTAvshVu", longopts, NULL)) != -1) {
         switch (opt) {
         case 'n':
             opts.number_lines = 1;
@@ -53,18 +52,18 @@ t_opts opts_parser(int argc, char **argv) {
             opts.show_ends = opts.show_tabs = opts.show_nonprint = 1;
             break;
         case 'h':
-            print_help(argv[0]);
+            print_help(options[0]);
             break;
         case 'V':
-            print_version(argv[0]);
+            print_version(options[0]);
             break;
         case 'u':
             break;
         default:
             if (optopt == 0) {
-                usage_exit_long(argv[0], argv[optind - 1]);
+                usage_exit_long(options[0], options[optind - 1]);
             } else {
-                usage_exit(argv[0], optopt);
+                usage_exit(options[0], optopt);
             }
         }
     }
