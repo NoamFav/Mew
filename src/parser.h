@@ -1,6 +1,11 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+enum {
+    OPT_COLOR = 256,
+    OPT_RANGE = 256,
+};
+
 typedef struct s_opts {
     int number_lines;
     int number_nonblank;
@@ -9,6 +14,7 @@ typedef struct s_opts {
     int show_nonprint;
     int squeeze_blank;
     int firstoperand;
+    int show_color;
 } t_opts;
 
 t_opts opts_parser(int argc, char **argv);
