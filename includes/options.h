@@ -3,7 +3,7 @@
 
 enum {
     OPT_COLOR = 256,
-    OPT_RANGE = 256,
+    OPT_RANGE = 257,
 };
 
 enum {

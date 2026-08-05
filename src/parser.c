@@ -13,7 +13,7 @@ static const struct option longopts[] = {
     {"show-nonprinting", no_argument, NULL, 'v'},
     {"squeeze-blank", no_argument, NULL, 's'},
     {"show-all", no_argument, NULL, 'A'},
-    {"colors", optional_argument, NULL, OPT_COLOR},
+    {"color", optional_argument, NULL, OPT_COLOR},
     {"show-range", required_argument, NULL, OPT_RANGE},
     {"help", no_argument, NULL, 'h'},
     {"version", no_argument, NULL, 'V'},
@@ -55,10 +55,10 @@ t_opts opts_parser(int option_count, char **options) {
             opts.show_ends = opts.show_tabs = opts.show_nonprint = 1;
             break;
         case 'h':
-            print_help(options[0]);
+            print_help(options[0], opts);
             break;
         case 'V':
-            print_version(options[0]);
+            print_version(options[0], opts);
             break;
         case OPT_COLOR:
             if (optarg == NULL || nf_strcmp(optarg, "auto") == 0) {
@@ -73,9 +73,9 @@ t_opts opts_parser(int option_count, char **options) {
             break;
         default:
             if (optopt == 0) {
-                usage_exit_long(options[0], options[optind - 1]);
+                usage_exit_long(options[0], options[optind - 1], opts);
             } else {
-                usage_exit(options[0], optopt);
+                usage_exit(options[0], optopt, opts);
             }
         }
     }

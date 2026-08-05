@@ -35,10 +35,9 @@ static void print_usage_trailer(const char *prog, int color) {
     put_err(" -h / --help for more information\n");
 }
 
-void usage_exit(const char *prog, int c) {
-    int color;
+void usage_exit(const char *prog, int c, t_opts opts) {
+    int color = iscolor(opts, STDERR_FILENO);
 
-    color = isatty(STDERR_FILENO);
     col_on(STDERR_FILENO, color, COL_ERR);
     put_err(prog);
     put_err(": invalid option -- '");
@@ -50,10 +49,9 @@ void usage_exit(const char *prog, int c) {
     exit(1);
 }
 
-void usage_exit_long(const char *prog, const char *s) {
-    int color;
+void usage_exit_long(const char *prog, const char *s, t_opts opts) {
+    int color = iscolor(opts, STDERR_FILENO);
 
-    color = isatty(STDERR_FILENO);
     col_on(STDERR_FILENO, color, COL_ERR);
     put_err(prog);
     put_err(": unknown options '");
@@ -65,8 +63,8 @@ void usage_exit_long(const char *prog, const char *s) {
     exit(1);
 }
 
-void print_help(const char *prog) {
-    int color = isatty(STDOUT_FILENO);
+void print_help(const char *prog, t_opts opts) {
+    int color = iscolor(opts, STDOUT_FILENO);
 
     put_str("A modern alternative to cat\n\n");
     put_c(STDOUT_FILENO, color, COL_HEAD, "Usage:\n");
@@ -91,8 +89,8 @@ void print_help(const char *prog) {
     exit(0);
 }
 
-void print_version(const char *prog) {
-    int color = isatty(STDOUT_FILENO);
+void print_version(const char *prog, t_opts opts) {
+    int color = iscolor(opts, STDOUT_FILENO);
 
     put_str(prog);
     put_str(": ");
