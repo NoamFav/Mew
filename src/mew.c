@@ -1,31 +1,26 @@
 #include "mew.h"
+#include "files.h"
 #include "out/display_file.h"
 #include "parser.h"
 #include "util/error.h"
-#include <fcntl.h>
-#include <unistd.h>
 
-static int display_loop(int argc, char **argv, t_opts opts) {
+static int display_loop(int file_count, char **file, t_opts opts) {
     int fd;
     int i;
     int error;
 
     error = 0;
-    if (opts.firstoperand == argc)
+    if (opts.firstoperand == file_count)
         return (display_file(0, opts, "-"));
     i = opts.firstoperand;
-    while (i < argc) {
-        if (argv[i][0] == '-' && argv[i][1] == '\0')
-            fd = 0;
-        else
-            fd = open(argv[i], O_RDONLY);
+    while (i < file_count) {
+        fd = open_operand(file[i]);
         if (fd == -1)
-            error = file_error(argv[i]);
+            error = file_error(file[i]);
         else {
-            if (display_file(fd, opts, argv[i]))
+            if (display_file(fd, opts, file[i]))
                 error = 1;
-            if (fd > 0)
-                close(fd);
+            close_operand(fd);
         }
         i++;
     }
