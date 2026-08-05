@@ -6,6 +6,12 @@ enum {
     OPT_RANGE = 256,
 };
 
+enum {
+    COLOR_AUTO,
+    COLOR_NEVER,
+    COLOR_ALWAYS,
+};
+
 typedef struct s_opts {
     int number_lines;
     int number_nonblank;
