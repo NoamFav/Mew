@@ -1,7 +1,7 @@
 #ifndef DISPLAY_FILE_H
 #define DISPLAY_FILE_H
 
-#include "parser.h"
+#include "options.h"
 #include <unistd.h>
 
 #define NUM_WIDTH 6
