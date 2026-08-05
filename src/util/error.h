@@ -6,6 +6,7 @@
 #include <string.h>
 
 #define PROGNAME "mew"
+#define VERSION "v1.1.0"
 
 int file_error(const char *name);
 void usage_exit(const char *prog, int c);
