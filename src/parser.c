@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "parser.h"
+#include "util/str.h"
 #include "util/usage.h"
 #include <getopt.h>
 #include <stddef.h>
@@ -12,7 +13,7 @@ static const struct option longopts[] = {
     {"show-nonprinting", no_argument, NULL, 'v'},
     {"squeeze-blank", no_argument, NULL, 's'},
     {"show-all", no_argument, NULL, 'A'},
-    {"show-colors", optional_argument, NULL, OPT_COLOR},
+    {"colors", optional_argument, NULL, OPT_COLOR},
     {"show-range", required_argument, NULL, OPT_RANGE},
     {"help", no_argument, NULL, 'h'},
     {"version", no_argument, NULL, 'V'},
@@ -58,6 +59,15 @@ t_opts opts_parser(int option_count, char **options) {
             break;
         case 'V':
             print_version(options[0]);
+            break;
+        case OPT_COLOR:
+            if (optarg == NULL || nf_strcmp(optarg, "auto") == 0) {
+                opts.show_color = COLOR_AUTO;
+            } else if (nf_strcmp(optarg, "never") == 0) {
+                opts.show_color = COLOR_NEVER;
+            } else if (nf_strcmp(optarg, "always") == 0) {
+                opts.show_color = COLOR_ALWAYS;
+            }
             break;
         case 'u':
             break;
