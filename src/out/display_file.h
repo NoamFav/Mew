@@ -2,7 +2,7 @@
 #define DISPLAY_FILE_H
 
 #include "options.h"
-#include <unistd.h>
+#include <stddef.h>
 
 #define NUM_WIDTH 6
 #define SPACES "      "

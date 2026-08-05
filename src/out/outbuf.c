@@ -1,6 +1,7 @@
 #include "out/outbuf.h"
 #include "util/io.h"
 #include "util/str.h"
+#include <unistd.h>
 
 int ob_flush(t_outbuf *outbuf) {
     int ret = 0;

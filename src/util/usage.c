@@ -2,6 +2,8 @@
 #include "util/colors.h"
 #include "util/io.h"
 #include "util/str.h"
+#include <stdlib.h>
+#include <unistd.h>
 
 static void put_errch(char c) {
     write_all(STDERR_FILENO, &c, 1);

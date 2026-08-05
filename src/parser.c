@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include "parser.h"
 #include "util/usage.h"
+#include <getopt.h>
 
 static const struct option longopts[] = {
     {"number", no_argument, NULL, 'n'},

@@ -1,8 +1,6 @@
 #ifndef USAGE_H
 #define USAGE_H
 
-#include <stdlib.h>
-
 #define VERSION "v1.1.0"
 void print_help(const char *prog);
 void print_version(const char *prog);
