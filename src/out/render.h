@@ -1,11 +1,11 @@
 #ifndef RENDER_H
 #define RENDER_H
+#include "options.h"
 #include "out/display_file.h"
 #include "out/outbuf.h"
-#include "options.h"
 
 int is_special(unsigned char c, t_opts opts);
 int emit_special(unsigned char c, t_opts opts, t_outbuf *ob);
-int emit_prefix(t_linestate *ls, t_opts o, t_outbuf *ob, int blank);
+int emit_prefix(t_linestate *ls, t_opts o, t_outbuf *ob, int blank, t_opts opts);
 
 #endif

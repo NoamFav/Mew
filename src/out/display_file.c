@@ -31,7 +31,7 @@ int display_file(int fd, t_opts opts, const char *name) {
                 continue;
             }
             if (linestate.at_bol && (opts.number_lines || opts.number_nonblank)) {
-                if (emit_prefix(&linestate, opts, &outbuf, buf[i] == '\n') == -1) {
+                if (emit_prefix(&linestate, opts, &outbuf, buf[i] == '\n', opts) == -1) {
                     return (file_error(name));
                 }
                 linestate.at_bol = 0;
