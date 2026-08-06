@@ -32,13 +32,14 @@
 <td width="50%" valign="top">
 
 ### The Project
-**mew** is a `cat` reimplementation in C11. No `printf`, no `stdlib` aside from `exit` — just four syscalls: `open`, `read`, `write`, `close`.
+**mew** is a `cat` reimplementation in C11. No `printf`, no `stdlib` beyond `exit`/`getenv` — just four syscalls at its core: `open`, `read`, `write`, `close`.
 
 It handles:
 - One or more **file arguments**
 - **Standard input** — when called with no args, or with `-` as a filename
-- **POSIX flags** — parsed with `getopt(3)` into a `t_opts` struct
-- Proper **error reporting** on stderr, prefixed with the program name
+- **Short and long flags** — parsed with `getopt_long(3)` into a `t_opts` struct
+- **Colorized output** — `--color[=WHEN]`, terminal auto-detection, `NO_COLOR` support
+- Proper **error reporting** on stderr, prefixed with the program name — including a clean message for directory arguments
 - **Partial writes** — a `write_all` loop ensures every byte reaches the output
 
 </td>
@@ -95,9 +96,10 @@ No shortcuts. No buffering from the C library. Real I/O.
 - **Partial writes handled** — `write_all` loops until every byte is flushed
 - **Errors to stderr** — `mew: <filename>: <reason>` format, exit code 1
 - **Write failures caught too** — a closed fd or full disk fails the same way a read error does, instead of silently exiting 0
+- **Directory arguments** — detected up front via `fstat`, reported as `mew: <name>: Is a directory` instead of misbehaving on a directory fd
 - **No stdio buffering** — `read()`/`write()` go straight to the kernel; no `fopen`, no `printf`
 - **Strict compilation** — `-Wall -Wextra -Werror` plus shadow, VLA, format checks, clean on GCC and Clang
-- **Tested** — `make test` runs a byte-for-byte suite against `cat`, in CI across Ubuntu/macOS and gcc/clang
+- **Tested** — `make test` runs a byte-for-byte suite against `cat` plus flag, edge-case, and color coverage, in CI across Ubuntu/macOS and gcc/clang
 
 </td>
 </tr>
@@ -113,23 +115,25 @@ No shortcuts. No buffering from the C library. Real I/O.
 
 <br>
 
-`src/parser.c` parses these with `getopt(3)` into a `t_opts` struct that's threaded through `display_loop()` and `display_file()`:
+`src/parser.c` parses these with `getopt_long(3)` into a `t_opts` struct that's threaded through `display_loop()` and `display_file()`. Every flag below accepts either form — `mew -n file` and `mew --number file` are equivalent:
 
-| Flag | Meaning |
-|------|---------|
-| `-A` | Equivalent to `-vET` |
-| `-b` | Number nonempty output lines, overrides `-n` |
-| `-e` | Equivalent to `-vE` |
-| `-E` | Display `$` at the end of each line |
-| `-n` | Number all output lines |
-| `-s` | Suppress repeated empty output lines |
-| `-t` | Equivalent to `-vT` |
-| `-T` | Display TAB characters as `^I` |
-| `-u` | Accepted and ignored (POSIX compatibility) |
-| `-v` | Show non-printing characters using `^` and `M-` notation |
-| `--color[=WHEN]` | Colorize mew's own output — see [Color Output](#color-output) below |
+| Short | Long | Meaning |
+|-------|------|---------|
+| `-A` | `--show-all` | Equivalent to `-vET` |
+| `-b` | `--number-nonblank` | Number nonempty output lines, overrides `-n` |
+| `-e` | — | Equivalent to `-vE` |
+| `-E` | `--show-ends` | Display `$` at the end of each line |
+| `-h` | `--help` | Display help and exit |
+| `-n` | `--number` | Number all output lines |
+| `-s` | `--squeeze-blank` | Suppress repeated empty output lines |
+| `-t` | — | Equivalent to `-vT` |
+| `-T` | `--show-tabs` | Display TAB characters as `^I` |
+| `-u` | — | Accepted and ignored (POSIX compatibility) |
+| `-v` | `--show-nonprinting` | Show non-printing characters using `^` and `M-` notation |
+| `-V` | `--version` | Output version information and exit |
+| — | `--color[=WHEN]` | Colorize mew's own output — see [Color Output](#color-output) below |
 
-An unrecognized flag prints a `usage:` message to stderr and exits with status 1.
+An unrecognized flag prints a `usage:` message to stderr and exits with status 1. `--` ends option parsing explicitly — everything after it is treated as a filename, even if it looks like a flag (`mew -- -n` reads a file literally named `-n`).
 
 `-v` (and the non-printing part of `-e`/`-t`/`-A`) covers the full byte
 range, not just ASCII control characters:
@@ -204,6 +208,9 @@ make release
 ./mew -                     # read from stdin
 echo "hello" | ./mew
 ./mew -n file1.txt          # with flags, e.g. number output lines
+./mew --number-nonblank file1.txt   # long-option form works everywhere -n/-b/etc. do
+./mew --help                        # usage + full flag list, exit 0
+./mew --version                     # e.g. "mew: v2.0.0", exit 0
 ```
 
 > [!NOTE]
@@ -312,6 +319,8 @@ Release  -O2 -DNDEBUG
 
 This is a collaborative 42 project — contributions are welcome and expected.
 New to GitHub collaboration? The [CONTRIBUTING.md](./CONTRIBUTING.md) covers everything from forking to getting your PR merged, step by step.
+
+See [CHANGELOG.md](./CHANGELOG.md) for what changed in each release.
 
 </div>
 
