@@ -101,6 +101,24 @@ for f in "$INPUTS"/*; do
     expect_files_equal "byte-for-byte vs cat: $name" "$TMP/cat_cmp.out" "$TMP/cat_cmp.expected"
 done
 
+# 8. "--" end-of-options marker -> "-n" treated as a filename, not a flag
+err=$("$MEW" -- -n 2>&1 >/dev/null)
+code=$?
+expect_exit "'--' end-of-options exit code" "$code" 1
+expect_contains "'--' end-of-options stderr message" "$err" "-n"
+
+# 9. directory argument -> clean "Is a directory" error, exit code 1
+err=$("$MEW" "$TMP" 2>&1 >/dev/null)
+code=$?
+expect_exit "directory argument exit code" "$code" 1
+expect_contains "directory argument stderr message" "$err" "Is a directory"
+
+# 10. mixed short and long flags in one invocation
+"$MEW" -n --show-ends "$INPUTS/multiline.txt" >"$TMP/mixed_flags.out"
+"$MEW" -nE "$INPUTS/multiline.txt" >"$TMP/mixed_flags.expected"
+expect_files_equal "mixed long/short flags (-n --show-ends == -nE)" \
+    "$TMP/mixed_flags.out" "$TMP/mixed_flags.expected"
+
 total=$((pass + fail))
 printf '\ntests passed: %d/%d\n' "$pass" "$total"
 
