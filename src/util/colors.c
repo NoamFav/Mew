@@ -2,6 +2,7 @@
 #include "options.h"
 #include "util/io.h"
 #include "util/str.h"
+#include <stdlib.h>
 #include <unistd.h>
 
 void col_on(int fd, int color, const char *code) {
@@ -21,6 +22,8 @@ void put_c(int fd, int color, const char *code, const char *s) {
 }
 
 int iscolor(t_opts opts, int fd) {
+    if (getenv("NO_COLOR") != NULL)
+        return (0);
     if (opts.show_color == COLOR_ALWAYS)
         return (1);
     if (opts.show_color == COLOR_NEVER)
