@@ -127,6 +127,7 @@ No shortcuts. No buffering from the C library. Real I/O.
 | `-T` | Display TAB characters as `^I` |
 | `-u` | Accepted and ignored (POSIX compatibility) |
 | `-v` | Show non-printing characters using `^` and `M-` notation |
+| `--color[=WHEN]` | Colorize mew's own output — see [Color Output](#color-output) below |
 
 An unrecognized flag prints a `usage:` message to stderr and exits with status 1.
 
@@ -140,6 +141,34 @@ range, not just ASCII control characters:
 | `0x80`–`0x9F` | `M-^@`–`M-^_` |
 | `0xA0`–`0xFE` | `M-` + the literal stripped byte |
 | `0xFF` | `M-^?` |
+
+#### Color Output
+
+`--color[=WHEN]` controls ANSI color on mew's own output: line numbers
+(`-n`/`-b`), non-printing notation (`-v`/`-T`/`-E`), and mew's
+`--help`/`--version`/error messages. Plain file content is never
+colorized — only what mew itself renders around it.
+
+| `WHEN` | Behavior |
+|--------|----------|
+| `auto` (default) | Colored only when stdout is a real terminal |
+| `always` | Always colored, even when piped or redirected |
+| `never` | Never colored |
+
+`--color` with no `=WHEN` behaves like `--color=auto`.
+
+```sh
+./mew -n file.txt              # colored only if stdout is a terminal
+./mew -n file.txt | less -R    # --color=always needed to survive the pipe
+./mew --color=always -n file.txt | less -R
+./mew --color=never -n file.txt   # force plain, e.g. for scripts
+```
+
+> [!NOTE]
+> `NO_COLOR` overrides everything above, including `--color=always` —
+> if it's set to *anything* (even an empty string), mew never emits
+> color. This follows the [NO_COLOR](https://no-color.org) convention:
+> presence of the variable is what matters, not its value.
 
 > [!NOTE]
 > `parser.c` targets `#define _POSIX_C_SOURCE 200809L` (POSIX.1-2008)
@@ -218,23 +247,27 @@ make fclean   # clean + remove the mew binary
 Mew/
 ├── main.c                  Entry point — calls mew()
 ├── includes/
-│   └── mew.h               PROGNAME + mew()/display_loop() prototypes
+│   ├── mew.h               mew() prototype
+│   └── options.h           t_opts struct + OPT_COLOR/OPT_RANGE, COLOR_* enum
 ├── src/
-│   ├── mew.c               Argument loop — delegates to display_file()
-│   ├── parser.c            getopt() flag parsing → t_opts
-│   ├── parser.h            t_opts struct + opts_parser() prototype
+│   ├── mew.c               Argument loop — delegates to files.c + display_file()
+│   ├── files.c / files.h   open_operand()/close_operand() — "-" vs. real path
+│   ├── parser.c            getopt_long() flag parsing → t_opts
+│   ├── parser.h            opts_parser() prototype
 │   ├── out/
 │   │   ├── display_file.c  Core I/O — read() loop, drives rendering + flush
 │   │   ├── display_file.h  display_file() prototype + t_linestate
-│   │   ├── render.c        Special-character rendering (-T/-E/-v/-n)
+│   │   ├── render.c        Special-character + color rendering (-T/-E/-v/-n)
 │   │   ├── render.h        is_special() / emit_special() / emit_prefix()
 │   │   ├── outbuf.c        Buffered writer — ob_append() / ob_flush()
 │   │   └── outbuf.h
 │   └── util/
-│       ├── error.c         file_error(), usage_exit()
+│       ├── error.c         file_error() — runtime I/O error reporting
+│       ├── usage.c         print_help()/print_version()/usage_exit[_long]()
+│       ├── colors.c        col_on()/col_off()/put_c()/iscolor() — NO_COLOR + isatty
 │       ├── io.c            write_all()
 │       ├── num.c           count_digits(), num_to_buf()
-│       └── str.c           getlen(), nf_memcpy()
+│       └── str.c           getlen(), nf_memcpy(), nf_strcmp()
 ├── tests/
 │   ├── run_tests.sh        POSIX shell test suite
 │   ├── inputs/             Fixture files (text + binary)
