@@ -48,5 +48,13 @@ jobs:
         run: |
           ./mew /nonexistent 2>&1 | grep -q "mew:" && exit 0 || exit 1
 
+      - name: Smoke test — --help exits 0 with output
+        run: |
+          out=$(./mew --help) && [ -n "$out" ] && exit 0 || exit 1
+
+      - name: Smoke test — --version exits 0 with output
+        run: |
+          out=$(./mew --version) && [ -n "$out" ] && exit 0 || exit 1
+
       - name: Clean
         run: make fclean

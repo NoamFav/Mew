@@ -55,6 +55,29 @@ expect_contains() {
     esac
 }
 
+expect_not_contains() {
+    name=$1
+    haystack=$2
+    needle=$3
+    case "$haystack" in
+    *"$needle"*) ko "$name" "expected output NOT to contain an escape byte" ;;
+    *) ok "$name" ;;
+    esac
+}
+
+# Run "$@" attached to a pseudo-terminal (BSD vs. GNU `script` differ in
+# invocation syntax) so --color=auto's isatty() check sees a real tty.
+run_tty() {
+    case "$(uname)" in
+    Darwin | *BSD)
+        script -q /dev/null "$@" 2>/dev/null
+        ;;
+    *)
+        script -qec "$*" /dev/null 2>/dev/null
+        ;;
+    esac
+}
+
 if [ ! -x "$MEW" ]; then
     printf 'error: %s not found -- run `make` first\n' "$MEW" >&2
     exit 1
@@ -118,6 +141,57 @@ expect_contains "directory argument stderr message" "$err" "Is a directory"
 "$MEW" -nE "$INPUTS/multiline.txt" >"$TMP/mixed_flags.expected"
 expect_files_equal "mixed long/short flags (-n --show-ends == -nE)" \
     "$TMP/mixed_flags.out" "$TMP/mixed_flags.expected"
+
+# 11. long options with a direct system-cat short-flag equivalent
+#     (portable across BSD/GNU cat -- both support -s/-v)
+for pair in "--squeeze-blank:-s" "--show-nonprinting:-v"; do
+    long=${pair%%:*}
+    short=${pair##*:}
+    "$MEW" "$long" "$INPUTS/blank_lines.txt" >"$TMP/longopt.out"
+    cat "$short" "$INPUTS/blank_lines.txt" >"$TMP/longopt.expected"
+    expect_files_equal "$long matches system cat $short" "$TMP/longopt.out" "$TMP/longopt.expected"
+done
+
+# 12. long options that can't be compared to system cat byte-for-byte --
+#     -E/-T/-A have no BSD-cat equivalent, and -n/-b use mew's own
+#     box-drawing separator instead of cat's tab (a deliberate divergence).
+#     Verify against mew's own short flag instead.
+for pair in "--number:-n" "--number-nonblank:-b" "--show-ends:-E" "--show-tabs:-T" "--show-all:-A"; do
+    long=${pair%%:*}
+    short=${pair##*:}
+    "$MEW" "$long" "$INPUTS/multiline.txt" >"$TMP/longopt.out"
+    "$MEW" "$short" "$INPUTS/multiline.txt" >"$TMP/longopt.expected"
+    expect_files_equal "$long matches mew's own $short" "$TMP/longopt.out" "$TMP/longopt.expected"
+done
+
+# 13. --color=always / --color=never / --color=auto (piped) / NO_COLOR
+ESC=$(printf '\033')
+
+out=$("$MEW" --color=always -n "$INPUTS/single_line.txt")
+expect_contains "--color=always emits color, even piped" "$out" "$ESC"
+
+out=$("$MEW" --color=never -n "$INPUTS/single_line.txt")
+expect_not_contains "--color=never never emits color" "$out" "$ESC"
+
+out=$("$MEW" --color=auto -n "$INPUTS/single_line.txt")
+expect_not_contains "--color=auto is plain when piped (not a tty)" "$out" "$ESC"
+
+out=$(NO_COLOR=1 "$MEW" --color=always -n "$INPUTS/single_line.txt")
+expect_not_contains "NO_COLOR overrides --color=always" "$out" "$ESC"
+
+# --color=auto on a *real* tty should emit color -- needs a pseudo-terminal,
+# which `script` can't reliably provide in every CI sandbox. Best-effort:
+# run it as a real test when `script` is available, skip (uncounted) otherwise,
+# so a missing/broken pty never fails the whole suite.
+if command -v script >/dev/null 2>&1; then
+    tty_out=$(run_tty "$MEW" --color=auto -n "$INPUTS/single_line.txt")
+    case "$tty_out" in
+    *"$ESC"*) ok "--color=auto emits color on a real tty" ;;
+    *) ko "--color=auto emits color on a real tty" "no escape byte via script-allocated tty" ;;
+    esac
+else
+    printf 'SKIP: --color=auto emits color on a real tty -- `script` not available\n'
+fi
 
 total=$((pass + fail))
 printf '\ntests passed: %d/%d\n' "$pass" "$total"
