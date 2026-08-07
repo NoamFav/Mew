@@ -2,7 +2,12 @@
 
 static const char b64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-size_t base64_encode(const unsigned char *src, size_t len, char *out) {
+size_t base64_encode(const unsigned char *src, size_t len, char *out, size_t out_size) {
+    size_t needed = ((len + 2) / 3) * 4 + 1;
+    if (out_size < needed) {
+        return 0;
+    }
+
     size_t i = 0, j = 0;
     for (; i + 2 < len; i += 3) {
         out[j++] = b64_table[(src[i] >> 2) & 0x3F];

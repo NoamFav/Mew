@@ -3,6 +3,6 @@
 
 #include <stddef.h>
 
-size_t base64_encode(const unsigned char *src, size_t len, char *out);
+size_t base64_encode(const unsigned char *src, size_t len, char *out, size_t out_size);
 
 #endif
