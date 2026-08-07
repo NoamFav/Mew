@@ -18,7 +18,7 @@ else
   LDFLAGS += -fsanitize=address,undefined
 endif
 
-SOURCES := $(shell find src -name '*.c' -not -path './build/*' | sed 's|^\./||')
+SOURCES := $(shell find . -name '*.c' -not -path './tests/*' -not -path './build/*' | sed 's|^\./||')
 OBJDIR  := build/$(BUILD)
 OBJECTS := $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPS    := $(OBJECTS:.o=.d)
