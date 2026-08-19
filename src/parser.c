@@ -17,6 +17,8 @@ static const struct option longopts[] = {
     {"show-range", required_argument, NULL, OPT_RANGE},
     {"help", no_argument, NULL, 'h'},
     {"version", no_argument, NULL, 'V'},
+    {"style", required_argument, NULL, OPT_STYLE},
+    {"plain", no_argument, NULL, 'p'},
     {0, 0, 0, 0},
 };
 
@@ -24,6 +26,8 @@ t_opts opts_parser(int option_count, char **options) {
     t_opts opts = {0};
     int opt;
     opterr = 0;
+    const char *errtok;
+    size_t errlen;
 
     while ((opt = getopt_long(option_count, options, "+nbeEtTAvshVu", longopts, NULL)) != -1) {
         switch (opt) {
@@ -68,6 +72,13 @@ t_opts opts_parser(int option_count, char **options) {
             } else if (nf_strcmp(optarg, "always") == 0) {
                 opts.show_color = COLOR_ALWAYS;
             }
+            break;
+        case OPT_STYLE:
+            if (parse_style(optarg, &opts.style, &errtok, &errlen))
+                usage_exit_style(options[0], errtok, opts);
+            break;
+        case 'p':
+            opts.style = OPT_PLAIN;
             break;
         case 'u':
             break;

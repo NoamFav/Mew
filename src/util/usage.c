@@ -35,6 +35,14 @@ static void print_usage_trailer(const char *prog, int color) {
     put_err(" -h / --help for more information\n");
 }
 
+static void print_usage_style(const char *prog, int color) {
+    put_c(STDERR_FILENO, color, COL_HEAD, "Usage: ");
+    put_err(prog);
+    put_err(" --style=[ARGS],... [FILE]...\n");
+    put_err("options: ");
+    put_err("[header / rule / full / plain]\n");
+}
+
 void usage_exit(const char *prog, int c, t_opts opts) {
     int color = iscolor(opts, STDERR_FILENO);
 
@@ -60,6 +68,20 @@ void usage_exit_long(const char *prog, const char *s, t_opts opts) {
     col_off(STDERR_FILENO, color);
     put_err("\n");
     print_usage_trailer(prog, color);
+    exit(1);
+}
+
+void usage_exit_style(const char *prog, const char *s, t_opts opts) {
+    int color = iscolor(opts, STDERR_FILENO);
+
+    col_on(STDERR_FILENO, color, COL_ERR);
+    put_err(prog);
+    put_err(": unknown style options '");
+    put_err(s);
+    put_err("'");
+    col_off(STDERR_FILENO, color);
+    put_err("\n");
+    print_usage_style(prog, color);
     exit(1);
 }
 
