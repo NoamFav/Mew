@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "out/display_file.h"
+#include "out/decor.h"
 #include "out/outbuf.h"
 #include "out/render.h"
 #include "util/error.h"
@@ -15,6 +16,9 @@ int display_file(int fd, t_opts opts, const char *name) {
     t_linestate linestate = {1, 1, 1};
     t_outbuf outbuf = {{0}, 0};
 
+    if (opts.style & STYLE_HEADER) {
+        show_header(name, opts);
+    }
     while (1) {
         n = read(fd, buf, READ_SIZE);
         if (n <= 0) {
