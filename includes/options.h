@@ -29,7 +29,7 @@ enum {
 #define STYLE_DEFAULT (STYLE_HEADER | STYLE_RULE)
 #define STYLE_FULL (STYLE_HEADER | STYLE_RULE | STYLE_SYNTAX)
 
-const struct {
+static const struct {
     const char *name;
     size_t len;
     unsigned bits;

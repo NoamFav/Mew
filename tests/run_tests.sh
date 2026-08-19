@@ -13,14 +13,30 @@ trap 'rm -rf "$TMP"' EXIT
 pass=0
 fail=0
 
+# Colorize when stdout is a terminal and the user hasn't opted out via
+# NO_COLOR, matching mew's own color-detection convention.
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    C_GREEN=$(printf '\033[32m')
+    C_RED=$(printf '\033[31m')
+    C_YELLOW=$(printf '\033[33m')
+    C_BOLD=$(printf '\033[1m')
+    C_RESET=$(printf '\033[0m')
+else
+    C_GREEN=
+    C_RED=
+    C_YELLOW=
+    C_BOLD=
+    C_RESET=
+fi
+
 ok() {
     pass=$((pass + 1))
-    printf 'PASS: %s\n' "$1"
+    printf '%sPASS%s: %s\n' "$C_GREEN" "$C_RESET" "$1"
 }
 
 ko() {
     fail=$((fail + 1))
-    printf 'FAIL: %s -- %s\n' "$1" "$2"
+    printf '%sFAIL%s: %s -- %s\n' "$C_RED" "$C_RESET" "$1" "$2"
 }
 
 expect_files_equal() {
@@ -190,10 +206,16 @@ if command -v script >/dev/null 2>&1; then
     *) ko "--color=auto emits color on a real tty" "no escape byte via script-allocated tty" ;;
     esac
 else
-    printf 'SKIP: --color=auto emits color on a real tty -- `script` not available\n'
+    printf '%sSKIP%s: --color=auto emits color on a real tty -- `script` not available\n' \
+        "$C_YELLOW" "$C_RESET"
 fi
 
 total=$((pass + fail))
-printf '\ntests passed: %d/%d\n' "$pass" "$total"
+if [ "$fail" -eq 0 ]; then
+    summary_color=$C_GREEN
+else
+    summary_color=$C_RED
+fi
+printf '\n%s%stests passed: %d/%d%s\n' "$C_BOLD" "$summary_color" "$pass" "$total" "$C_RESET"
 
 [ "$fail" -eq 0 ]
