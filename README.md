@@ -241,10 +241,27 @@ echo "hello" | ./mew
 make          # debug build — ASAN + UBSAN, -g3
 make release  # release build — -O2 -DNDEBUG, no sanitizers
 make re       # fclean + all (full rebuild)
-make test     # build + run tests/run_tests.sh, non-zero exit on failure
+make test     # build + run tests/run_tests.sh + help/man-page sync guard
 make clean    # remove build/ directory
 make fclean   # clean + remove the mew binary
+make install  # install binary + man page (PREFIX=/usr/local by default)
+make uninstall
+make man      # preview docs/mew.1 without installing
 ```
+
+#### Installing
+
+```sh
+make install            # PREFIX=/usr/local by default
+make install PREFIX=$HOME/.local DESTDIR=""   # or anywhere you like
+```
+
+Both `PREFIX` and `DESTDIR` are honored (staging/packaging safe): the binary
+lands in `$DESTDIR$PREFIX/bin/mew` (0755) and this manual page in
+`$DESTDIR$PREFIX/share/man/man1/mew.1` (0644). After installing,
+`man mew` gives you the full offline reference — every option, exit status,
+environment variable and example, kept honest by a CI guard that fails if a
+flag ever ships without documentation (`tests/check_help_sync.sh`).
 
 <details>
 <summary><b>📁 Project Layout</b></summary>

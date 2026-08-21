@@ -40,7 +40,34 @@ fclean: clean
 re: fclean all
 debug: $(NAME)
 release: $(NAME)
+PREFIX  ?= /usr/local
+BINDIR  := $(PREFIX)/bin
+MANDIR  := $(PREFIX)/share/man/man1
+
+install: $(NAME) docs/mew.1
+	mkdir -p $(DESTDIR)$(BINDIR)
+	mkdir -p $(DESTDIR)$(MANDIR)
+	cp $(NAME) $(DESTDIR)$(BINDIR)/$(NAME)
+	chmod 0755 $(DESTDIR)$(BINDIR)/$(NAME)
+	cp docs/mew.1 $(DESTDIR)$(MANDIR)/$(NAME).1
+	chmod 0644 $(DESTDIR)$(MANDIR)/$(NAME).1
+
+uninstall:
+	rm -f $(DESTDIR)$(BINDIR)/$(NAME)
+	rm -f $(DESTDIR)$(MANDIR)/$(NAME).1
+
+man:
+	@if command -v mandoc >/dev/null 2>&1; then \
+		MANWIDTH=80 mandoc docs/mew.1 | col -b; \
+	elif man -l docs/mew.1 >/dev/null 2>&1; then \
+		MANWIDTH=80 man -l docs/mew.1 | col -b; \
+	else \
+		echo "no roff renderer found (need mandoc, groff or man-db)"; \
+		exit 1; \
+	fi
+
 test: $(NAME)
 	@bash tests/run_tests.sh
+	@sh tests/check_help_sync.sh
 
-.PHONY: all clean fclean re debug release test
+.PHONY: all clean fclean re debug release test install uninstall man
