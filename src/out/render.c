@@ -73,15 +73,23 @@ int emit_special(unsigned char c, t_opts opts, t_outbuf *ob) {
 int emit_prefix(t_linestate *ls, t_opts o, t_outbuf *ob, int blank, t_opts opts) {
     char num[24];
     size_t len, digits;
+    size_t shown;
 
     if (o.number_nonblank && blank) {
         return (0);
     }
-    digits = count_digits(ls->line_num);
+    /* With active ranges numbers reflect the line's original position in the
+     * file; without ranges keep v2.0.0's output-position counter. */
+    if (o.nranges > 0) {
+        shown = ls->phys_line;
+    } else {
+        shown = ls->line_num++;
+    }
+    digits = count_digits(shown);
     if (digits < NUM_WIDTH && ob_append(SPACES, NUM_WIDTH - digits, ob) == -1) {
         return (-1);
     }
-    len = num_to_buf(ls->line_num++, num);
+    len = num_to_buf(shown, num);
     if (ob_append_color(num, COL_MAGENTA, len, ob, opts) == -1) {
         return (-1);
     }
