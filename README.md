@@ -377,3 +377,7 @@ Made with ♥ by [NoamFav](https://github.com/NoamFav) and 42 contributors
 <img src="https://capsule-render.vercel.app/api?type=waving&height=120&color=gradient&customColorList=4&section=footer" />
 
 </div>
+
+## Integrations
+
+See [docs/integrations.md](docs/integrations.md) for nvim, fzf, git, and shell recipes.
