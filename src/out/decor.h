@@ -2,6 +2,9 @@
 #define DECOR_H
 
 #include "options.h"
-void show_header(const char *filename, t_opts opts);
+#include "out/outbuf.h"
+
+int emit_header(const char *filename, t_opts opts, t_outbuf *ob);
+int emit_rule(t_opts opts, t_outbuf *ob);
 
 #endif

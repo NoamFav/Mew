@@ -7,7 +7,7 @@
 #include "util/error.h"
 #include <unistd.h>
 
-int display_file(int fd, t_opts opts, const char *name) {
+int display_file(int fd, t_opts opts, const char *name, int is_first) {
     unsigned char buf[READ_SIZE];
     int interactive = isatty(fd);
     ssize_t n = 0;
@@ -16,8 +16,11 @@ int display_file(int fd, t_opts opts, const char *name) {
     t_linestate linestate = {1, 1, 1};
     t_outbuf outbuf = {{0}, 0};
 
-    if (opts.style & STYLE_HEADER) {
-        show_header(name, opts);
+    if (!is_first && (opts.style & STYLE_RULE) && emit_rule(opts, &outbuf) == -1) {
+        return (file_error(name));
+    }
+    if ((opts.style & STYLE_HEADER) && emit_header(name, opts, &outbuf) == -1) {
+        return (file_error(name));
     }
     while (1) {
         n = read(fd, buf, READ_SIZE);

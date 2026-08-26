@@ -29,7 +29,7 @@ t_opts opts_parser(int option_count, char **options) {
     const char *errtok;
     size_t errlen;
 
-    while ((opt = getopt_long(option_count, options, "+nbeEtTAvshVu", longopts, NULL)) != -1) {
+    while ((opt = getopt_long(option_count, options, "+nbeEtTAvshVup", longopts, NULL)) != -1) {
         switch (opt) {
         case 'n':
             opts.number_lines = 1;
@@ -78,7 +78,7 @@ t_opts opts_parser(int option_count, char **options) {
                 usage_exit_style(options[0], errtok, opts);
             break;
         case 'p':
-            opts.style = OPT_PLAIN;
+            opts.style = STYLE_PLAIN;
             break;
         case 'u':
             break;

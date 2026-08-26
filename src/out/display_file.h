@@ -14,6 +14,6 @@ typedef struct s_linestate {
     int nl_run;
 } t_linestate;
 
-int display_file(int fd, t_opts opts, const char *name);
+int display_file(int fd, t_opts opts, const char *name, int is_first);
 
 #endif

@@ -82,7 +82,7 @@ void usage_exit_style(const char *prog, const char *s, t_opts opts) {
     col_off(STDERR_FILENO, color);
     put_err("\n");
     print_usage_style(prog, color);
-    exit(1);
+    exit(2);
 }
 
 void print_help(const char *prog, t_opts opts) {
