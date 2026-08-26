@@ -12,6 +12,10 @@ typedef struct s_linestate {
     size_t line_num;
     int at_bol;
     int nl_run;
+    int line_start;
+    int in_range;
+    size_t range_idx;
+    size_t phys_line;
 } t_linestate;
 
 int display_file(int fd, t_opts opts, const char *name, int is_first);

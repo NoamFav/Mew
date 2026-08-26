@@ -32,13 +32,14 @@
 <td width="50%" valign="top">
 
 ### The Project
-**mew** is a `cat` reimplementation in C11. No `printf`, no `stdlib` aside from `exit` — just four syscalls: `open`, `read`, `write`, `close`.
+**mew** is a `cat` reimplementation in C11. No `printf`, no `stdlib` beyond `exit`/`getenv` — just four syscalls at its core: `open`, `read`, `write`, `close`.
 
 It handles:
 - One or more **file arguments**
 - **Standard input** — when called with no args, or with `-` as a filename
-- **POSIX flags** — parsed with `getopt(3)` into a `t_opts` struct
-- Proper **error reporting** on stderr, prefixed with the program name
+- **Short and long flags** — parsed with `getopt_long(3)` into a `t_opts` struct
+- **Colorized output** — `--color[=WHEN]`, terminal auto-detection, `NO_COLOR` support
+- Proper **error reporting** on stderr, prefixed with the program name — including a clean message for directory arguments
 - **Partial writes** — a `write_all` loop ensures every byte reaches the output
 
 </td>
@@ -95,9 +96,10 @@ No shortcuts. No buffering from the C library. Real I/O.
 - **Partial writes handled** — `write_all` loops until every byte is flushed
 - **Errors to stderr** — `mew: <filename>: <reason>` format, exit code 1
 - **Write failures caught too** — a closed fd or full disk fails the same way a read error does, instead of silently exiting 0
+- **Directory arguments** — detected up front via `fstat`, reported as `mew: <name>: Is a directory` instead of misbehaving on a directory fd
 - **No stdio buffering** — `read()`/`write()` go straight to the kernel; no `fopen`, no `printf`
 - **Strict compilation** — `-Wall -Wextra -Werror` plus shadow, VLA, format checks, clean on GCC and Clang
-- **Tested** — `make test` runs a byte-for-byte suite against `cat`, in CI across Ubuntu/macOS and gcc/clang
+- **Tested** — `make test` runs a byte-for-byte suite against `cat` plus flag, edge-case, and color coverage, in CI across Ubuntu/macOS and gcc/clang
 
 </td>
 </tr>
@@ -113,23 +115,26 @@ No shortcuts. No buffering from the C library. Real I/O.
 
 <br>
 
-`src/parser.c` parses these with `getopt(3)` into a `t_opts` struct that's threaded through `display_loop()` and `display_file()`:
+`src/parser.c` parses these with `getopt_long(3)` into a `t_opts` struct that's threaded through `display_loop()` and `display_file()`. Every flag below accepts either form — `mew -n file` and `mew --number file` are equivalent:
 
-| Flag | Meaning |
-|------|---------|
-| `-A` | Equivalent to `-vET` |
-| `-b` | Number nonempty output lines, overrides `-n` |
-| `-e` | Equivalent to `-vE` |
-| `-E` | Display `$` at the end of each line |
-| `-n` | Number all output lines |
-| `-s` | Suppress repeated empty output lines |
-| `-t` | Equivalent to `-vT` |
-| `-T` | Display TAB characters as `^I` |
-| `-u` | Accepted and ignored (POSIX compatibility) |
-| `-v` | Show non-printing characters using `^` and `M-` notation |
-| `--color[=WHEN]` | Colorize mew's own output — see [Color Output](#color-output) below |
+| Short | Long | Meaning |
+|-------|------|---------|
+| `-A` | `--show-all` | Equivalent to `-vET` |
+| `-b` | `--number-nonblank` | Number nonempty output lines, overrides `-n` |
+| `-e` | — | Equivalent to `-vE` |
+| `-E` | `--show-ends` | Display `$` at the end of each line |
+| `-h` | `--help` | Display help and exit |
+| `-n` | `--number` | Number all output lines |
+| `-r` | `--line-range=RANGE` | Print only lines in RANGE (`N:M`, `N:`, `:M`, `N`), repeatable: see [Line Ranges](#line-ranges) |
+| `-s` | `--squeeze-blank` | Suppress repeated empty output lines |
+| `-t` | — | Equivalent to `-vT` |
+| `-T` | `--show-tabs` | Display TAB characters as `^I` |
+| `-u` | — | Accepted and ignored (POSIX compatibility) |
+| `-v` | `--show-nonprinting` | Show non-printing characters using `^` and `M-` notation |
+| `-V` | `--version` | Output version information and exit |
+| — | `--color[=WHEN]` | Colorize mew's own output — see [Color Output](#color-output) below |
 
-An unrecognized flag prints a `usage:` message to stderr and exits with status 1.
+An unrecognized flag prints a `usage:` message to stderr and exits with status 1. `--` ends option parsing explicitly — everything after it is treated as a filename, even if it looks like a flag (`mew -- -n` reads a file literally named `-n`).
 
 `-v` (and the non-printing part of `-e`/`-t`/`-A`) covers the full byte
 range, not just ASCII control characters:
@@ -179,6 +184,43 @@ colorized — only what mew itself renders around it.
 > glibc's GNU-style flag reordering. Concretely: `mew -n file.txt` works,
 > `mew file.txt -n` doesn't — on every platform mew targets, not just some.
 
+### Line Ranges
+
+`-r RANGE` / `--line-range=RANGE` answers the `sed -n '10,40p'` question
+natively: show only part of a file.
+
+| Form | Meaning |
+|------|---------|
+| `N:M` | Lines N through M, inclusive (1-based) |
+| `N:` | From line N to the end of the file |
+| `:M` | From line 1 through line M |
+| `N` | Exactly line N |
+
+Semantics:
+
+- **Repeatable**: `-r 1:5 -r 30:40` shows both ranges, up to 8 of them.
+- **Per file**: ranges reset for each operand. `mew -r 1:3 a.txt b.txt`
+  prints the first 3 lines of each file.
+- **Original positions**: with `-n`/`-b`, numbers reflect each line's
+  position in the file, so line 30 prints as 30 even when lines 1 to 29
+  were filtered out. This is what makes ranges useful for code review.
+- **Squeeze after filtering**: `-s` operates on what is emitted; lines it
+  suppresses still advance the numbering.
+- **Union normalization**: overlapping or unsorted ranges merge, so a
+  line prints at most once, in file order.
+- **Errors**: `N > M` (like `5:2`), non-numeric components, zero values,
+  overflow, and more than 8 ranges are usage errors (exit status 2).
+  An end past EOF clamps silently.
+
+Reading stops once the last wanted line has been emitted: `mew -r 1:5`
+on a multi-gigabyte log reads five lines instead of draining the file.
+
+```sh
+./mew -r 2:4 notes.md            # lines 2, 3 and 4
+./mew -n -r 30:32 main.c         # numbered 30, 31, 32
+./mew -r :2 -r 10: changelog.md  # head and tail in one pass
+```
+
 <!-- Divider -->
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
 
@@ -204,6 +246,9 @@ make release
 ./mew -                     # read from stdin
 echo "hello" | ./mew
 ./mew -n file1.txt          # with flags, e.g. number output lines
+./mew --number-nonblank file1.txt   # long-option form works everywhere -n/-b/etc. do
+./mew --help                        # usage + full flag list, exit 0
+./mew --version                     # e.g. "mew: v2.0.0", exit 0
 ```
 
 > [!NOTE]
@@ -234,10 +279,27 @@ echo "hello" | ./mew
 make          # debug build — ASAN + UBSAN, -g3
 make release  # release build — -O2 -DNDEBUG, no sanitizers
 make re       # fclean + all (full rebuild)
-make test     # build + run tests/run_tests.sh, non-zero exit on failure
+make test     # build + run tests/run_tests.sh + help/man-page sync guard
 make clean    # remove build/ directory
 make fclean   # clean + remove the mew binary
+make install  # install binary + man page (PREFIX=/usr/local by default)
+make uninstall
+make man      # preview docs/mew.1 without installing
 ```
+
+#### Installing
+
+```sh
+make install            # PREFIX=/usr/local by default
+make install PREFIX=$HOME/.local DESTDIR=""   # or anywhere you like
+```
+
+Both `PREFIX` and `DESTDIR` are honored (staging/packaging safe): the binary
+lands in `$DESTDIR$PREFIX/bin/mew` (0755) and this manual page in
+`$DESTDIR$PREFIX/share/man/man1/mew.1` (0644). After installing,
+`man mew` gives you the full offline reference — every option, exit status,
+environment variable and example, kept honest by a CI guard that fails if a
+flag ever ships without documentation (`tests/check_help_sync.sh`).
 
 <details>
 <summary><b>📁 Project Layout</b></summary>
@@ -312,6 +374,8 @@ Release  -O2 -DNDEBUG
 
 This is a collaborative 42 project — contributions are welcome and expected.
 New to GitHub collaboration? The [CONTRIBUTING.md](./CONTRIBUTING.md) covers everything from forking to getting your PR merged, step by step.
+
+See [CHANGELOG.md](./CHANGELOG.md) for what changed in each release.
 
 </div>
 

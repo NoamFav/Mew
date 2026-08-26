@@ -2,6 +2,7 @@
 #define OPTIONS_H
 
 #include <stddef.h>
+#define MAX_RANGES 8
 
 enum {
     OPT_COLOR = 256,
@@ -39,6 +40,10 @@ static const struct {
     {"syntax", 6, STYLE_SYNTAX, 0},   {"full", 4, STYLE_FULL, 1},
     {"default", 7, STYLE_DEFAULT, 1}, {"plain", 5, STYLE_PLAIN, 1},
 };
+typedef struct s_range {
+    long lo;
+    long hi;
+} t_range;
 
 typedef struct s_opts {
     int number_lines;
@@ -50,6 +55,8 @@ typedef struct s_opts {
     int firstoperand;
     int show_color;
     unsigned style;
+    t_range ranges[MAX_RANGES];
+    int nranges;
 } t_opts;
 
 #endif
