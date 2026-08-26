@@ -4,6 +4,10 @@
 #include "util/str.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include "util/io.h"
+#include "util/str.h"
+#include <stdlib.h>
+#include <unistd.h>
 
 static void put_errch(char c) {
     write_all(STDERR_FILENO, &c, 1);
@@ -27,7 +31,7 @@ static void put_opt(int color, const char *flag, const char *desc) {
 }
 
 static void print_usage_trailer(const char *prog, int color) {
-    put_c(STDERR_FILENO, color, COL_HEAD, "Usage: ");
+    put_c(STDERR_FILENO, color, COL_HEAD
     put_err(prog);
     put_err(" [OPTIONS] [FILE]...\n");
     put_err("see: ");
@@ -35,15 +39,15 @@ static void print_usage_trailer(const char *prog, int color) {
     put_err(" -h / --help for more information\n");
 }
 
-static void print_usage_style(const char *prog, int color) {
-    put_c(STDERR_FILENO, color, COL_HEAD, "Usage: ");
+static void print_usage_style(const char
+    put_c(STDERR_FILENO, color, COL_HEAD
     put_err(prog);
-    put_err(" --style=[ARGS],... [FILE]...\n");
+    put_err(" --style=[ARGS],... [FILE].
     put_err("options: ");
-    put_err("[header / rule / full / plain]\n");
+    put_err("[header / rule / full / pla
 }
 
-void usage_exit(const char *prog, int c, t_opts opts) {
+void usage_exit(const char *prog, int c,
     int color = iscolor(opts, STDERR_FILENO);
 
     col_on(STDERR_FILENO, color, COL_ERR);
@@ -74,7 +78,7 @@ void usage_exit_long(const char *prog, const char *s, t_opts opts) {
 void usage_exit_style(const char *prog, const char *s, t_opts opts) {
     int color = iscolor(opts, STDERR_FILENO);
 
-    col_on(STDERR_FILENO, color, COL_ERR);
+    col_on(STDERR_FILENO, color, COL_ERR
     put_err(prog);
     put_err(": unknown style options '");
     put_err(s);
@@ -85,7 +89,21 @@ void usage_exit_style(const char *prog, const char *s, t_opts opts) {
     exit(2);
 }
 
-void print_help(const char *prog, t_opts opts) {
+void range_error_exit(const char *prog, const char *s, t_opts opts) {
+    int color = iscolor(opts, STDERR_FILENO);
+
+    col_on(STDERR_FILENO, color, COL_ERR);
+    put_err(prog);
+    put_err(": invalid line range '");
+    put_err(s);
+    put_err("'");
+    col_off(STDERR_FILENO, color);
+    put_err("\n");
+    print_usage_trailer(prog, color);
+    exit(2);
+}
+
+void print_help(const char *prog, t_opts
     int color = iscolor(opts, STDOUT_FILENO);
 
     put_str("A modern alternative to cat\n\n");
@@ -94,20 +112,20 @@ void print_help(const char *prog, t_opts opts) {
     put_str(" [OPTIONS] [FILE]...\n\n");
     put_c(STDOUT_FILENO, color, COL_HEAD, "Arguments:\n");
     put_str("  [FILE]...  File(s) to print. Use - or <blank> for stdin\n\n");
-    put_c(STDOUT_FILENO, color, COL_HEAD, "Options:\n");
+    put_c(STDOUT_FILENO, color, COL_HEAD
     put_opt(color, "  -A, --show-all", "           equivalent to -vET\n");
     put_opt(color, "  -b, --number-nonblank", "    number nonempty output lines, overrides -n\n");
     put_opt(color, "  -e", "                       equivalent to -vE\n");
     put_opt(color, "  -E, --show-ends", "          display $ at end of each line\n");
     put_opt(color, "  -n, --number", "             number all output lines\n");
-    put_opt(color, "  -s, --squeeze-blank", "      suppress repeated empty output lines\n");
+    put_opt(color, "  -s, --squeeze-blaned empty output lines\n");
     put_opt(color, "  -t", "                       equivalent to -vT\n");
     put_opt(color, "  -T, --show-tabs", "          display TAB characters as ^I\n");
-    put_opt(color, "  -u", "                       (ignored)\n");
-    put_opt(color, "  -v, --show-nonprinting",
+    put_opt(color, "  -u", "
+    put_opt(color, "  -v, --show-nonprin
             "   use ^ and M- notation, except for LFD and TAB\n");
     put_opt(color, "  -h, --help", "               display this help and exit\n");
-    put_opt(color, "  -V, --version", "            output version information and exit\n");
+    put_opt(color, "  -V, --version", " information and exit\n");
     exit(0);
 }
 
