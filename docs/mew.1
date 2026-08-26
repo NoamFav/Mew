@@ -103,6 +103,36 @@ line numbers reflect each line's original position in the file.
 An invalid range (start greater than end, non-numeric, zero, out of
 range, or more than 8 ranges) is a usage error.
 .TP
+.BR "\-\-style=\fILIST\fP"
+Enable decoration components, a comma-separated list of
+.BR header ,
+.BR rule ,
+.BR full
+(shorthand for
+.BR header,rule ),
+or
+.BR plain
+(no decorations; also settable with a leading
+.BR \- ,
+e.g.
+.BR full,\-rule ).
+.B header
+prints a decorated filename line before each file's content;
+.B rule
+prints a full-width separator between files
+(never before the first or after the last).
+Default is
+.BR plain ,
+so piped output stays byte-identical to
+.BR cat (1).
+An unknown component is a usage error.
+.TP
+.BR \-p ", " \-\-plain
+Equivalent to
+.BR "\-\-style=plain" :
+disable all decorations. The conventional short spelling for
+.BR "\-\-style=plain" .
+.TP
 .BR \-h ", " \-\-help
 Print a summary of options and exit successfully.
 .TP
@@ -123,6 +153,8 @@ Usage error (unknown or invalid option) or I/O error
 .B 2
 Invalid
 .B \-\-line\-range
+or
+.B \-\-style
 argument.
 .SH ENVIRONMENT
 .TP
@@ -185,6 +217,14 @@ Show only lines 30 through 32, numbered by original position:
 .nf
 .RS
 mew \-n \-r 30:32 main.c
+.RE
+.fi
+.PP
+Print two files with a decorated header and a rule between them:
+.PP
+.nf
+.RS
+mew \-\-style=full header.txt body.txt
 .RE
 .fi
 .PP
