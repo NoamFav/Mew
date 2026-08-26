@@ -1,5 +1,6 @@
 CC      ?= cc
 NAME    := mew
+TEST_NAME := test_base64
 
 CFLAGS  := -std=c11 -Wall -Wextra -Werror -Wshadow -Wswitch-enum \
            -Wformat=2 -Wwrite-strings -Wvla -Wmissing-prototypes \
@@ -17,7 +18,7 @@ else
   LDFLAGS += -fsanitize=address,undefined
 endif
 
-SOURCES := $(shell find . -name '*.c' -not -path './build/*' | sed 's|^\./||')
+SOURCES := $(shell find . -name '*.c' -not -path './tests/*' -not -path './build/*' | sed 's|^\./||')
 OBJDIR  := build/$(BUILD)
 OBJECTS := $(SOURCES:%.c=$(OBJDIR)/%.o)
 DEPS    := $(OBJECTS:.o=.d)
@@ -31,10 +32,13 @@ $(OBJDIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
+$(TEST_NAME): tests/base64_test.c src/util/base64.c
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
 -include $(DEPS)
 
 clean:
-	rm -rf build
+	rm -rf build $(TEST_NAME)
 fclean: clean
 	rm -f $(NAME)
 re: fclean all
@@ -66,7 +70,8 @@ man:
 		exit 1; \
 	fi
 
-test: $(NAME)
+test: $(NAME) $(TEST_NAME)
+	@./$(TEST_NAME)
 	@bash tests/run_tests.sh
 	@sh tests/check_help_sync.sh
 
