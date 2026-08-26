@@ -190,6 +190,8 @@ t_opts opts_parser(int option_count, char **options) {
         case 'p':
             opts.style = STYLE_PLAIN;
         case 'r':
+            add_range(&opts, optarg, options[0]);
+            break;
         case OPT_RANGE:
             add_range(&opts, optarg, options[0]);
             break;
