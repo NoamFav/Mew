@@ -1,0 +1,206 @@
+.\" Manual page for mew (v2.0.0). Written in classic man(7) macros:
+.\" no pandoc, no scdoc — hand-rolled, like everything else here.
+.\" Render with: MANWIDTH=80 man -l docs/mew.1 | col -b
+.TH MEW 1 "2026-08-21" "mew v2.0.0" "User Commands"
+.SH NAME
+mew \- a modern alternative to cat
+.SH SYNOPSIS
+.B mew
+.RI [ OPTION ]...
+.RI [ FILE ]...
+.SH DESCRIPTION
+.B mew
+concatenates files and prints them to standard output.
+It aims to be a modern alternative to
+.BR cat (1):
+when standard output is not a terminal it behaves like a plain filter,
+and on a terminal it can present line numbers and colored highlights.
+It has zero dependencies beyond a C compiler and the C standard library.
+With no
+.I FILE
+arguments, or when
+.I FILE
+is
+.BR \- ,
+standard input is read.
+.SH OPTIONS
+Grouped like
+.B \-\-help :
+first the cat-classic filters, then presentation,
+then information.
+.TP
+.BR \-b ", " \-\-number\-nonblank
+Number nonempty output lines; overrides
+.BR \-n .
+.TP
+.BR \-A ", " \-\-show\-all
+Equivalent to
+.BR \-vET .
+.TP
+.BR \-e
+Equivalent to
+.BR \-vE .
+.TP
+.BR \-E ", " \-\-show\-ends
+Display $ at end of each line.
+.TP
+.BR \-n ", " \-\-number
+Number all output lines.
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+Suppress repeated empty output lines.
+.TP
+.BR \-t
+Equivalent to
+.BR \-vT .
+.TP
+.BR \-T ", " \-\-show\-tabs
+Display TAB characters as ^I.
+.TP
+.BR \-u
+Ignored; accepted for POSIX compatibility.
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+Use ^ and M\- notation, except for LFD and TAB.
+.TP
+.BR "\-\-color[=\fIWHEN\fP]"
+Colorize
+.BR mew 's
+own decorations.
+.I WHEN
+may be
+.BR always ,
+.BR auto ,
+or
+.BR never ;
+the default is
+.BR auto ,
+which colors only when standard output is a terminal.
+Note that
+.B NO_COLOR
+(see
+.B ENVIRONMENT
+below) also suppresses color.
+.TP
+.BR \-\-show\-range
+Declared in this release but not implemented:
+any invocation aborts with a usage error.
+It is listed here so the option inventory stays complete;
+see the project issue tracker for its planned
+.IR RANGE \ ( START : END )
+semantics.
+.TP
+.BR \-h ", " \-\-help
+Print a summary of options and exit successfully.
+.TP
+.BR \-V ", " \-\-version
+Print version information and exit successfully.
+.PP
+Exit status and option behavior follow the conventions described below;
+any option received but not listed here is rejected with a usage message.
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Usage error (unknown or invalid option) or I/O error
+(missing or unreadable input file).
+.SH ENVIRONMENT
+.TP
+.B NO_COLOR
+When set to any nonempty value, disables colored output
+even when
+.B \-\-color=always
+would otherwise apply on a terminal.
+.SH EXAMPLES
+Number every line of a file:
+.PP
+.nf
+.RS
+mew \-n src/parser.c
+.RE
+.fi
+.PP
+Number only nonempty lines, squeeze runs of blanks:
+.PP
+.nf
+.RS
+mew \-bs notes.txt
+.RE
+.fi
+.PP
+Show tabs and ends explicitly while debugging whitespace:
+.PP
+.nf
+.RS
+mew \-ET Makefile
+.RE
+.fi
+.PP
+Reveal nonprinting characters in a suspicious file:
+.PP
+.nf
+.RS
+mew \-v dump.bin
+.RE
+.fi
+.PP
+Force color even through a pipe (e.g. for a pager that understands it):
+.PP
+.nf
+.RS
+mew \-\-color=always build.log | less \-R
+.RE
+.fi
+.PP
+Guarantee plain output for scripting, whatever the terminal:
+.PP
+.nf
+.RS
+mew \-\-color=never config.yml
+.RE
+.fi
+.PP
+Read from standard input, numbered:
+.PP
+.nf
+.RS
+curl \-s https://example.com | mew \-n
+.RE
+.fi
+.PP
+Concatenate several inputs into one stream:
+.PP
+.nf
+.RS
+mew header.txt body.txt footer.txt > out.txt
+.RE
+.fi
+.SH INSTALLATION
+The page you are reading ships with the source tree.
+Build and install with:
+.PP
+.nf
+.RS
+make
+make install          # PREFIX=/usr/local by default
+.RE
+.fi
+.PP
+Both
+.B PREFIX
+and
+.B DESTDIR
+are honored; the manual page lands in
+.IR $PREFIX/share/man/man1/mew.1 .
+Preview this page without installing:
+.PP
+.nf
+.RS
+make man
+.RE
+.fi
+.SH SEE ALSO
+.BR cat (1),
+.BR less (1)

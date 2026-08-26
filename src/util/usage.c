@@ -63,6 +63,20 @@ void usage_exit_long(const char *prog, const char *s, t_opts opts) {
     exit(1);
 }
 
+void range_error_exit(const char *prog, const char *s, t_opts opts) {
+    int color = iscolor(opts, STDERR_FILENO);
+
+    col_on(STDERR_FILENO, color, COL_ERR);
+    put_err(prog);
+    put_err(": invalid line range '");
+    put_err(s);
+    put_err("'");
+    col_off(STDERR_FILENO, color);
+    put_err("\n");
+    print_usage_trailer(prog, color);
+    exit(2);
+}
+
 void print_help(const char *prog, t_opts opts) {
     int color = iscolor(opts, STDOUT_FILENO);
 

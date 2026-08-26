@@ -125,6 +125,7 @@ No shortcuts. No buffering from the C library. Real I/O.
 | `-E` | `--show-ends` | Display `$` at the end of each line |
 | `-h` | `--help` | Display help and exit |
 | `-n` | `--number` | Number all output lines |
+| `-r` | `--line-range=RANGE` | Print only lines in RANGE (`N:M`, `N:`, `:M`, `N`), repeatable: see [Line Ranges](#line-ranges) |
 | `-s` | `--squeeze-blank` | Suppress repeated empty output lines |
 | `-t` | — | Equivalent to `-vT` |
 | `-T` | `--show-tabs` | Display TAB characters as `^I` |
@@ -182,6 +183,43 @@ colorized — only what mew itself renders around it.
 > POSIX's non-permuting "options before operands" behavior instead of
 > glibc's GNU-style flag reordering. Concretely: `mew -n file.txt` works,
 > `mew file.txt -n` doesn't — on every platform mew targets, not just some.
+
+### Line Ranges
+
+`-r RANGE` / `--line-range=RANGE` answers the `sed -n '10,40p'` question
+natively: show only part of a file.
+
+| Form | Meaning |
+|------|---------|
+| `N:M` | Lines N through M, inclusive (1-based) |
+| `N:` | From line N to the end of the file |
+| `:M` | From line 1 through line M |
+| `N` | Exactly line N |
+
+Semantics:
+
+- **Repeatable**: `-r 1:5 -r 30:40` shows both ranges, up to 8 of them.
+- **Per file**: ranges reset for each operand. `mew -r 1:3 a.txt b.txt`
+  prints the first 3 lines of each file.
+- **Original positions**: with `-n`/`-b`, numbers reflect each line's
+  position in the file, so line 30 prints as 30 even when lines 1 to 29
+  were filtered out. This is what makes ranges useful for code review.
+- **Squeeze after filtering**: `-s` operates on what is emitted; lines it
+  suppresses still advance the numbering.
+- **Union normalization**: overlapping or unsorted ranges merge, so a
+  line prints at most once, in file order.
+- **Errors**: `N > M` (like `5:2`), non-numeric components, zero values,
+  overflow, and more than 8 ranges are usage errors (exit status 2).
+  An end past EOF clamps silently.
+
+Reading stops once the last wanted line has been emitted: `mew -r 1:5`
+on a multi-gigabyte log reads five lines instead of draining the file.
+
+```sh
+./mew -r 2:4 notes.md            # lines 2, 3 and 4
+./mew -n -r 30:32 main.c         # numbered 30, 31, 32
+./mew -r :2 -r 10: changelog.md  # head and tail in one pass
+```
 
 <!-- Divider -->
 <img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif" width="100%">
@@ -241,10 +279,27 @@ echo "hello" | ./mew
 make          # debug build — ASAN + UBSAN, -g3
 make release  # release build — -O2 -DNDEBUG, no sanitizers
 make re       # fclean + all (full rebuild)
-make test     # build + run tests/run_tests.sh, non-zero exit on failure
+make test     # build + run tests/run_tests.sh + help/man-page sync guard
 make clean    # remove build/ directory
 make fclean   # clean + remove the mew binary
+make install  # install binary + man page (PREFIX=/usr/local by default)
+make uninstall
+make man      # preview docs/mew.1 without installing
 ```
+
+#### Installing
+
+```sh
+make install            # PREFIX=/usr/local by default
+make install PREFIX=$HOME/.local DESTDIR=""   # or anywhere you like
+```
+
+Both `PREFIX` and `DESTDIR` are honored (staging/packaging safe): the binary
+lands in `$DESTDIR$PREFIX/bin/mew` (0755) and this manual page in
+`$DESTDIR$PREFIX/share/man/man1/mew.1` (0644). After installing,
+`man mew` gives you the full offline reference — every option, exit status,
+environment variable and example, kept honest by a CI guard that fails if a
+flag ever ships without documentation (`tests/check_help_sync.sh`).
 
 <details>
 <summary><b>📁 Project Layout</b></summary>
