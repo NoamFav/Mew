@@ -1,7 +1,7 @@
 .\" Manual page for mew (v2.0.0). Written in classic man(7) macros:
 .\" no pandoc, no scdoc — hand-rolled, like everything else here.
 .\" Render with: MANWIDTH=80 man -l docs/mew.1 | col -b
-.TH MEW 1 "2026-08-21" "mew v2.0.0" "User Commands"
+.TH MEW 1 "2026-08-27" "mew v2.0.0" "User Commands"
 .SH NAME
 mew \- a modern alternative to cat
 .SH SYNOPSIS
@@ -82,13 +82,26 @@ Note that
 .B ENVIRONMENT
 below) also suppresses color.
 .TP
-.BR \-\-show\-range
-Declared in this release but not implemented:
-any invocation aborts with a usage error.
-It is listed here so the option inventory stays complete;
-see the project issue tracker for its planned
-.IR RANGE \ ( START : END )
-semantics.
+.BR \-r \ \fIRANGE\fP ", " \-\-line\-range=\fIRANGE\fP
+Print only the lines in
+.IR RANGE .
+Accepts
+.BR N:M
+(lines N through M, inclusive),
+.BR N:
+(line N to end of file),
+.BR :M
+(start of file through line M), or a bare
+.BR N
+(just line N). Repeatable, up to 8 ranges; overlapping or unsorted
+ranges are merged into their union and each line prints at most once.
+Ranges are per file: they reset at each
+.I FILE
+operand. Under
+.BR \-n / \-b
+line numbers reflect each line's original position in the file.
+An invalid range (start greater than end, non-numeric, zero, out of
+range, or more than 8 ranges) is a usage error.
 .TP
 .BR \-h ", " \-\-help
 Print a summary of options and exit successfully.
@@ -106,6 +119,11 @@ Success.
 .B 1
 Usage error (unknown or invalid option) or I/O error
 (missing or unreadable input file).
+.TP
+.B 2
+Invalid
+.B \-\-line\-range
+argument.
 .SH ENVIRONMENT
 .TP
 .B NO_COLOR
@@ -159,6 +177,14 @@ Guarantee plain output for scripting, whatever the terminal:
 .nf
 .RS
 mew \-\-color=never config.yml
+.RE
+.fi
+.PP
+Show only lines 30 through 32, numbered by original position:
+.PP
+.nf
+.RS
+mew \-n \-r 30:32 main.c
 .RE
 .fi
 .PP
