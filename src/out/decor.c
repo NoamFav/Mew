@@ -1,6 +1,6 @@
 #include "decor.h"
 #include "options.h"
-#include "util/colors.h"
+#include "util/print/colors.h"
 #include "util/str.h"
 #include <unistd.h>
 

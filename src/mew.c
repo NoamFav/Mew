@@ -2,7 +2,7 @@
 #include "files.h"
 #include "out/display_file.h"
 #include "parser.h"
-#include "util/error.h"
+#include "util/print/error.h"
 
 static int is_dash(const char *s) {
     return (s[0] == '-' && s[1] == '\0');

@@ -4,14 +4,13 @@
 #include "out/decor.h"
 #include "out/outbuf.h"
 #include "out/render.h"
-#include "util/error.h"
+#include "util/print/error.h"
 #include <unistd.h>
 
 /* Advance the range cursor (ranges are sorted and merged) and report whether
  * the current physical line must be emitted. */
 static int range_wants(t_linestate *ls, const t_opts *opts) {
-    while (ls->range_idx < (size_t)opts->nranges &&
-           opts->ranges[ls->range_idx].hi != -1 &&
+    while (ls->range_idx < (size_t)opts->nranges && opts->ranges[ls->range_idx].hi != -1 &&
            ls->phys_line > (size_t)opts->ranges[ls->range_idx].hi) {
         ls->range_idx++;
     }
@@ -72,8 +71,7 @@ int display_file(int fd, t_opts opts, const char *name, int is_first) {
                     }
                     return (0);
                 }
-                linestate.in_range =
-                    opts.nranges == 0 || range_wants(&linestate, &opts);
+                linestate.in_range = opts.nranges == 0 || range_wants(&linestate, &opts);
                 linestate.line_start = 0;
             }
             if (!linestate.in_range) {

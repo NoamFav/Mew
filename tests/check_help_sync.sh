@@ -3,7 +3,7 @@
 #
 # Grep-level contract: every long option declared in parser.c's longopts[]
 # MUST appear in both `mew --help` output and docs/mew.1, and the version in
-# the page must match src/util/usage.h. Catches "added a flag, forgot the
+# the page must match src/util/print/usage.h. Catches "added a flag, forgot the
 # docs" without pretending to understand semantics.
 
 set -u
@@ -20,8 +20,14 @@ note() {
     printf 'FAIL: %s\n' "$1"
 }
 
-[ -x "$MEW" ] || { note "mew binary not found — run make first"; exit 1; }
-[ -f "$PAGE" ] || { note "man page not found: docs/mew.1"; exit 1; }
+[ -x "$MEW" ] || {
+    note "mew binary not found — run make first"
+    exit 1
+}
+[ -f "$PAGE" ] || {
+    note "man page not found: docs/mew.1"
+    exit 1
+}
 
 HELP="$(mktemp)"
 PAGE_FLAT="$(mktemp)"
@@ -37,7 +43,10 @@ sed 's/\\//g' "$PAGE" >"$PAGE_FLAT"
 
 # Every long option in longopts[], e.g. {"show-range", required_argument, ...}
 LONGS=$(sed -n 's/^ *{"\([a-z][a-z-]*\)".*/\1/p' "$PARSER")
-[ -n "$LONGS" ] || { note "no long options parsed from $PARSER — parser format changed?"; exit 1; }
+[ -n "$LONGS" ] || {
+    note "no long options parsed from $PARSER — parser format changed?"
+    exit 1
+}
 
 for opt in $LONGS; do
     dashdash="--$opt"
@@ -50,8 +59,11 @@ for opt in $LONGS; do
         note "'$dashdash' missing from docs/mew.1"
 done
 
-VERSION=$(sed -n 's/^#define VERSION "\(.*\)"$/\1/p' "$ROOT/src/util/usage.h")
-[ -n "$VERSION" ] || { note "could not read VERSION from src/util/usage.h"; exit 1; }
+VERSION=$(sed -n 's/^#define VERSION "\(.*\)"$/\1/p' "$ROOT/src/util/print/usage.h")
+[ -n "$VERSION" ] || {
+    note "could not read VERSION from src/util/print/usage.h"
+    exit 1
+}
 grep -q -- "$VERSION" "$PAGE_FLAT" ||
     note "version '$VERSION' not stated in docs/mew.1 (.TH)"
 

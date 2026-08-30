@@ -1,6 +1,6 @@
-#include "util/colors.h"
+#include "util/print/colors.h"
 #include "options.h"
-#include "util/io.h"
+#include "util/print/io.h"
 #include "util/str.h"
 #include <stdlib.h>
 #include <unistd.h>

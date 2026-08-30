@@ -1,8 +1,8 @@
 #include "out/render.h"
 #include "out/display_file.h"
 #include "out/outbuf.h"
-#include "util/colors.h"
 #include "util/num.h"
+#include "util/print/colors.h"
 #include "util/str.h"
 #include <unistd.h>
 
